@@ -1,11 +1,15 @@
 package com.automatedTradingApplication.news;
 
+import com.automatedTradingApplication.ScheduledTaskExecutor;
 import com.automatedTradingApplication.alpaca.AlpacaClient;
+import net.jacobpeterson.alpaca.openapi.trader.model.Position;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
 
 @Component
 public class ScheduledNewsCall {
@@ -19,6 +23,9 @@ public class ScheduledNewsCall {
     @Autowired
     private ArticleSentimentRepository articleSentimentRepository;
 
+    @Autowired
+    private ScheduledTaskExecutor scheduledTaskExecutor;
+
     Logger logger = LoggerFactory.getLogger(ScheduledNewsCall.class);
 
     @Scheduled(fixedRate = 12000)
@@ -31,11 +38,31 @@ public class ScheduledNewsCall {
             double score = articleSentiment.getScore();
             String ticker = articleSentiment.getTicker();
             if (score>0){
+                Position position = alpacaClient.getOrders("ADBE");
                 String volume = String.valueOf(Math.round((score*10000) * 100.0) / 100.0);
                 alpacaClient.buyVolume(volume, ticker);
+                Runnable sellBackTask = () -> {
+                    try {
+                        alpacaClient.sellBack(volume, ticker);
+                    } catch (Exception e) {
+                        logger.debug(e.toString());
+                    }
+                };
+                LocalDateTime scheduledTime = LocalDateTime.now().plusSeconds(10);
+                scheduledTaskExecutor.scheduleTaskAtSpecificTime(sellBackTask, scheduledTime);
             }else{
-                double volume = Math.round((score*-1000) * 100.0) / 100.0;
-                alpacaClient.shortVolume(volume, ticker);
+                Position position = alpacaClient.getOrders("ADBE");
+                double volume = Math.round((score*-10000) * 100.0) / 100.0;
+                double qty = alpacaClient.shortVolume(volume, ticker);
+                Runnable buyBackTask = () -> {
+                    try {
+                        alpacaClient.buyBack(qty, ticker);
+                    } catch (Exception e) {
+                        logger.debug(e.toString());
+                    }
+                };
+                LocalDateTime scheduledTime = LocalDateTime.now().plusSeconds(10);
+                scheduledTaskExecutor.scheduleTaskAtSpecificTime(buyBackTask, scheduledTime);
             }
         }
     }

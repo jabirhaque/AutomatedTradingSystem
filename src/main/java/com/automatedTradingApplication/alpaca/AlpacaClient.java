@@ -38,21 +38,40 @@ public class AlpacaClient {
         return alpacaAPI.marketData().stock().stockLatestTradeSingle(symbol, StockFeed.IEX, null).getTrade().getP();
     }
 
-    public void buyBackTest(int qty, String ticker) throws Exception{
-        logger.info("Attempting buy back {} qty of {}", qty, ticker);
+    public Position getOrders(String symbol) throws ApiException {
+         Position position = new AlpacaAPI(keyID, secretKey, endpointType, sourceType).trader().positions().getOpenPosition(symbol);
+         return position;
+    }
+
+    public void sellBack(String price, String symbol) throws ApiException {
+        Position position = getOrders(symbol);
+        logger.info("Attempting scheduled sale of ${} of {}", price, symbol);
         new AlpacaAPI(keyID, secretKey, endpointType, sourceType).trader().orders()
                 .postOrder(new PostOrderRequest()
-                        .symbol(ticker)
+                        .symbol(symbol)
+                        .notional(price)
+                        .side(OrderSide.SELL)
+                        .type(OrderType.MARKET)
+                        .timeInForce(TimeInForce.DAY));
+        logger.info("Completed scheduled sale of ${} of {}", price, symbol);
+    }
+
+    public void buyBack(double qty, String symbol) throws Exception{
+        Position position = getOrders(symbol);
+        logger.info("Attempting scheduled buy back {} qty of {}", qty, symbol);
+        new AlpacaAPI(keyID, secretKey, endpointType, sourceType).trader().orders()
+                .postOrder(new PostOrderRequest()
+                        .symbol(symbol)
                         .qty(String.valueOf(qty))
                         .side(OrderSide.BUY)
                         .type(OrderType.MARKET)
                         .timeInForce(TimeInForce.DAY));
-        logger.info("Buy back {} qty of {} complete", qty, ticker);
+        logger.info("Completed scheduled buy back {} qty of {}", qty, symbol);
     }
 
     public void buyVolume(String price, String symbol) throws Exception{
         logger.info("Attempting to purchase ${} of {}", price, symbol);
-        new AlpacaAPI(keyID, secretKey, endpointType, sourceType).trader().orders()
+        Order result = new AlpacaAPI(keyID, secretKey, endpointType, sourceType).trader().orders()
                 .postOrder(new PostOrderRequest()
                         .symbol(symbol)
                         .notional(price)
@@ -64,7 +83,7 @@ public class AlpacaClient {
         transactionRepository.save(transaction);
     }
 
-    public void shortVolume(double price, String symbol) throws ApiException, net.jacobpeterson.alpaca.openapi.marketdata.ApiException {
+    public double shortVolume(double price, String symbol) throws ApiException, net.jacobpeterson.alpaca.openapi.marketdata.ApiException {
         AlpacaAPI alpacaAPI = new AlpacaAPI(keyID, secretKey, endpointType, sourceType);
         double latestTradePrice = getLatestTradePrice(symbol);
 
@@ -86,5 +105,6 @@ public class AlpacaClient {
         }else{
             logger.info("${} of {} is not sufficient to short", price, symbol);
         }
+        return qty;
     }
 }
