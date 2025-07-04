@@ -38,12 +38,11 @@ public class ScheduledNewsCall {
             double score = articleSentiment.getScore();
             String ticker = articleSentiment.getTicker();
             if (score>0){
-                Position position = alpacaClient.getOrders("ADBE");
                 String volume = String.valueOf(Math.round((score*10000) * 100.0) / 100.0);
-                alpacaClient.buyVolume(volume, ticker);
+                String id = alpacaClient.buyVolume(volume, ticker);
                 Runnable sellBackTask = () -> {
                     try {
-                        alpacaClient.sellBack(volume, ticker);
+                        alpacaClient.sellBack(alpacaClient.getQty(id), ticker);
                     } catch (Exception e) {
                         logger.debug(e.toString());
                     }
@@ -51,12 +50,11 @@ public class ScheduledNewsCall {
                 LocalDateTime scheduledTime = LocalDateTime.now().plusSeconds(10);
                 scheduledTaskExecutor.scheduleTaskAtSpecificTime(sellBackTask, scheduledTime);
             }else{
-                Position position = alpacaClient.getOrders("ADBE");
                 double volume = Math.round((score*-10000) * 100.0) / 100.0;
-                double qty = alpacaClient.shortVolume(volume, ticker);
+                String id = alpacaClient.shortVolume(volume, ticker);
                 Runnable buyBackTask = () -> {
                     try {
-                        alpacaClient.buyBack(qty, ticker);
+                        alpacaClient.buyBack(alpacaClient.getQty(id), ticker);
                     } catch (Exception e) {
                         logger.debug(e.toString());
                     }
