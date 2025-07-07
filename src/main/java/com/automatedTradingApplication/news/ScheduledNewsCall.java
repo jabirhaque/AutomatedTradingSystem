@@ -2,7 +2,6 @@ package com.automatedTradingApplication.news;
 
 import com.automatedTradingApplication.ScheduledTaskExecutor;
 import com.automatedTradingApplication.alpaca.AlpacaClient;
-import net.jacobpeterson.alpaca.openapi.trader.model.Position;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +37,11 @@ public class ScheduledNewsCall {
             double score = articleSentiment.getScore();
             String ticker = articleSentiment.getTicker();
             if (score>0){
-                String volume = String.valueOf(Math.round((score*10000) * 100.0) / 100.0);
-                String id = alpacaClient.buyVolume(volume, ticker);
+                String qty = String.valueOf(alpacaClient.getQtyFromPrice(ticker,score*10000 , false));
+                alpacaClient.partitionedBuy(qty, ticker);
                 Runnable sellBackTask = () -> {
                     try {
-                        alpacaClient.sellBack(alpacaClient.getQty(id), ticker);
+                        alpacaClient.partitionedSale(qty, ticker);
                     } catch (Exception e) {
                         logger.debug(e.toString());
                     }
@@ -50,11 +49,11 @@ public class ScheduledNewsCall {
                 LocalDateTime scheduledTime = LocalDateTime.now().plusSeconds(10);
                 scheduledTaskExecutor.scheduleTaskAtSpecificTime(sellBackTask, scheduledTime);
             }else{
-                double volume = Math.round((score*-10000) * 100.0) / 100.0;
-                String id = alpacaClient.shortVolume(volume, ticker);
+                String qty = String.valueOf(alpacaClient.getQtyFromPrice(ticker, score*-10000, true));
+                String resultQty = alpacaClient.partitionedSale(qty, ticker);
                 Runnable buyBackTask = () -> {
                     try {
-                        alpacaClient.buyBack(alpacaClient.getQty(id), ticker);
+                        alpacaClient.partitionedBuy(resultQty, ticker);
                     } catch (Exception e) {
                         logger.debug(e.toString());
                     }
