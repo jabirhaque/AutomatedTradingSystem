@@ -65,7 +65,12 @@ public class AlpacaClient {
             logger.info("Partitioning sale request");
             String remainder = String.valueOf(Double.parseDouble(qty) - position);
             clearPosition(symbol);
-            return String.valueOf(Double.parseDouble(sell(symbol, remainder, true))+position);
+            try{
+                Thread.sleep(2000);
+            }catch(InterruptedException e){
+                e.printStackTrace();
+            }
+            return String.valueOf(Double.parseDouble(sell(remainder, symbol, true))+position);
         }if (position>Double.parseDouble(qty)){
             return sell(qty, symbol);
         }
@@ -79,6 +84,11 @@ public class AlpacaClient {
             logger.info("Partitioning buy request");
             String remainder = String.valueOf(Double.parseDouble(qty)+position);
             clearPosition(symbol);
+            try{
+                Thread.sleep(2000);
+            }catch(InterruptedException e){
+                e.printStackTrace();
+            }
             buy(remainder, symbol);
             return qty;
         }
@@ -95,27 +105,37 @@ public class AlpacaClient {
     private String buy(String qty, String symbol) throws ApiException {
         AlpacaAPI alpacaAPI = new AlpacaAPI(keyID, secretKey, endpointType, sourceType);
         logger.info("Buying {} of {}", qty, symbol);
-        Order order = alpacaAPI.trader().orders()
+        String orderId = alpacaAPI.trader().orders()
                 .postOrder(new PostOrderRequest()
                         .symbol(symbol)
                         .qty(qty)
                         .side(OrderSide.BUY)
                         .type(OrderType.MARKET)
-                        .timeInForce(TimeInForce.DAY));
-        return order.getFilledQty();
+                        .timeInForce(TimeInForce.DAY)).getId();
+        try{
+            Thread.sleep(2000);
+        }catch(InterruptedException e){
+            e.printStackTrace();
+        }
+        return alpacaAPI.trader().orders().getOrderByOrderID(UUID.fromString(orderId), false).getFilledQty();
     }
 
     private String sell(String qty, String symbol) throws ApiException {
         AlpacaAPI alpacaAPI = new AlpacaAPI(keyID, secretKey, endpointType, sourceType);
         logger.info("Selling {} of {}", qty, symbol);
-        Order order = alpacaAPI.trader().orders()
+        String orderId = alpacaAPI.trader().orders()
                 .postOrder(new PostOrderRequest()
                         .symbol(symbol)
                         .qty(String.valueOf(qty))
                         .side(OrderSide.SELL)
                         .type(OrderType.MARKET)
-                        .timeInForce(TimeInForce.DAY));
-        return order.getFilledQty();
+                        .timeInForce(TimeInForce.DAY)).getId();
+        try{
+            Thread.sleep(2000);
+        } catch(InterruptedException e){
+            e.printStackTrace();
+        }
+        return alpacaAPI.trader().orders().getOrderByOrderID(UUID.fromString(orderId), false).getFilledQty();
     }
 
     private String sell(String qty, String symbol, boolean shortSell) throws ApiException {

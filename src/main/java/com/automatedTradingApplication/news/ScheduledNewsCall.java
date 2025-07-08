@@ -27,7 +27,7 @@ public class ScheduledNewsCall {
 
     Logger logger = LoggerFactory.getLogger(ScheduledNewsCall.class);
 
-    @Scheduled(fixedRate = 12000)
+    @Scheduled(fixedRate = 15000)
     public void makeNewsCall() throws Exception {
         ArticleSentiment articleSentiment = sentimentService.callArticleSentiment();
         ArticleSentiment lastArticleSentiment = articleSentimentRepository.findTopByOrderByCreatedDesc();
@@ -46,10 +46,10 @@ public class ScheduledNewsCall {
                         logger.debug(e.toString());
                     }
                 };
-                LocalDateTime scheduledTime = LocalDateTime.now().plusSeconds(10);
+                LocalDateTime scheduledTime = LocalDateTime.now().plusSeconds(60);
                 scheduledTaskExecutor.scheduleTaskAtSpecificTime(sellBackTask, scheduledTime);
             }else{
-                String qty = String.valueOf(alpacaClient.getQtyFromPrice(ticker, score*-10000, true));
+                String qty = String.valueOf(alpacaClient.getQtyFromPrice(ticker, score*-10000, false));
                 String resultQty = alpacaClient.partitionedSale(qty, ticker);
                 Runnable buyBackTask = () -> {
                     try {
@@ -58,7 +58,7 @@ public class ScheduledNewsCall {
                         logger.debug(e.toString());
                     }
                 };
-                LocalDateTime scheduledTime = LocalDateTime.now().plusSeconds(10);
+                LocalDateTime scheduledTime = LocalDateTime.now().plusSeconds(60);
                 scheduledTaskExecutor.scheduleTaskAtSpecificTime(buyBackTask, scheduledTime);
             }
         }

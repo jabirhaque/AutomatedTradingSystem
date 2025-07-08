@@ -26,7 +26,6 @@ public class SentimentAnalyser {
     }
 
     public double analyzeSentiment(String text) {
-        //log.info("Calculating sentiment for text: " + text);
         Annotation annotation = new Annotation(text);
         pipeline.annotate(annotation);
         double result = 0;
@@ -39,7 +38,6 @@ public class SentimentAnalyser {
             }
             result += sentimentProbabilities[4] + sentimentProbabilities[3]/2 - sentimentProbabilities[1]/2 - sentimentProbabilities[0];
         }
-        //log.info("Sentiment calculated: " + String.valueOf(result));
         return result;
     }
 }
