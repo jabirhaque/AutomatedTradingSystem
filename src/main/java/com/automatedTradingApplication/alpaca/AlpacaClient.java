@@ -1,5 +1,6 @@
 package com.automatedTradingApplication.alpaca;
 
+import com.automatedTradingApplication.transaction.Transaction;
 import com.automatedTradingApplication.transaction.TransactionRepository;
 import net.jacobpeterson.alpaca.AlpacaAPI;
 import net.jacobpeterson.alpaca.model.util.apitype.MarketDataWebsocketSourceType;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,10 +46,6 @@ public class AlpacaClient {
         return alpacaAPI.marketData().stock().stockLatestTradeSingle(symbol, StockFeed.IEX, null).getTrade().getP();
     }
 
-    public String getQtyFromOrder(String uuid) throws ApiException {
-        return new AlpacaAPI(keyID, secretKey, endpointType, sourceType).trader().orders().getOrderByOrderID(UUID.fromString(uuid), false).getFilledQty();
-    }
-
     public String getQtyFromPosition(String symbol) throws ApiException {
         AlpacaAPI alpacaAPI = new AlpacaAPI(keyID, secretKey, endpointType, sourceType);
         List<String> list = alpacaAPI.trader().positions().getAllOpenPositions().stream().map(Position::getSymbol).toList();
@@ -58,51 +56,53 @@ public class AlpacaClient {
         }
     }
 
-    public String partitionedSale(String qty, String symbol) throws ApiException {
-        logger.info("Attempting sale of {} of {}", qty, symbol);
+    public String partitionedSale(String qty, String symbol, boolean exit) throws ApiException {
+        logger.info("Attempting {} sale of {} of {}", qty, symbol, (exit?"scheduled exit":""));
         double position = Double.parseDouble(getQtyFromPosition(symbol));
         if (position>0 && position<Double.parseDouble(qty)){
             logger.info("Partitioning sale request");
             String remainder = String.valueOf(Double.parseDouble(qty) - position);
-            clearPosition(symbol);
+            clearPosition(symbol, exit);
             try{
                 Thread.sleep(2000);
             }catch(InterruptedException e){
                 e.printStackTrace();
             }
-            return String.valueOf(Double.parseDouble(sell(remainder, symbol, true))+position);
+            return String.valueOf(Double.parseDouble(sell(remainder, symbol, exit, true))+position);
         }if (position>Double.parseDouble(qty)){
-            return sell(qty, symbol);
+            return sell(qty, symbol, exit);
         }
-        return sell(qty, symbol, true);
+        return sell(qty, symbol, exit, true);
     }
 
-    public String partitionedBuy(String qty, String symbol) throws Exception {
-        logger.info("Attempting buy of {} of {}", qty, symbol);
+    public String partitionedBuy(String qty, String symbol, boolean exit) throws Exception {
+        logger.info("Attempting {} buy of {} of {}", qty, symbol, (exit?"scheduled exit":""));
         double position = Double.parseDouble(getQtyFromPosition(symbol));
         if (position<0 && -1*position<Double.parseDouble(qty)){
             logger.info("Partitioning buy request");
             String remainder = String.valueOf(Double.parseDouble(qty)+position);
-            clearPosition(symbol);
+            clearPosition(symbol, exit);
             try{
                 Thread.sleep(2000);
             }catch(InterruptedException e){
                 e.printStackTrace();
             }
-            buy(remainder, symbol);
+            buy(remainder, symbol, exit);
             return qty;
         }
-        return buy(qty, symbol);
+        return buy(qty, symbol, exit);
     }
 
-    public void clearPosition(String symbol) throws ApiException {
+    public void clearPosition(String symbol, boolean exit) throws ApiException {
         AlpacaAPI alpacaAPI = new AlpacaAPI(keyID, secretKey, endpointType, sourceType);
         String qty = alpacaAPI.trader().positions().getOpenPosition(symbol).getQty();
         logger.info("Clearing {} of {}", qty, symbol);
-        alpacaAPI.trader().positions().deleteOpenPosition(symbol,  null, new BigDecimal("100"));
+        Order order = alpacaAPI.trader().positions().deleteOpenPosition(symbol,  null, new BigDecimal("100"));
+        Transaction transaction = Transaction.builder().ticker(symbol).transactionType(order.getSide().toString()).qty(Double.parseDouble(order.getFilledQty())).exit(exit).submittedTimestamp(LocalDateTime.now()).build();
+        transactionRepository.save(transaction);
     }
 
-    private String buy(String qty, String symbol) throws ApiException {
+    private String buy(String qty, String symbol, boolean exit) throws ApiException {
         AlpacaAPI alpacaAPI = new AlpacaAPI(keyID, secretKey, endpointType, sourceType);
         logger.info("Buying {} of {}", qty, symbol);
         String orderId = alpacaAPI.trader().orders()
@@ -117,10 +117,13 @@ public class AlpacaClient {
         }catch(InterruptedException e){
             e.printStackTrace();
         }
-        return alpacaAPI.trader().orders().getOrderByOrderID(UUID.fromString(orderId), false).getFilledQty();
+        Order order = alpacaAPI.trader().orders().getOrderByOrderID(UUID.fromString(orderId), false);
+        Transaction transaction = Transaction.builder().ticker(symbol).transactionType(order.getSide().toString()).qty(Double.parseDouble(order.getFilledQty())).exit(exit).submittedTimestamp(LocalDateTime.now()).build();
+        transactionRepository.save(transaction);
+        return order.getFilledQty();
     }
 
-    private String sell(String qty, String symbol) throws ApiException {
+    private String sell(String qty, String symbol, boolean exit) throws ApiException {
         AlpacaAPI alpacaAPI = new AlpacaAPI(keyID, secretKey, endpointType, sourceType);
         logger.info("Selling {} of {}", qty, symbol);
         String orderId = alpacaAPI.trader().orders()
@@ -135,13 +138,16 @@ public class AlpacaClient {
         } catch(InterruptedException e){
             e.printStackTrace();
         }
-        return alpacaAPI.trader().orders().getOrderByOrderID(UUID.fromString(orderId), false).getFilledQty();
+        Order order = alpacaAPI.trader().orders().getOrderByOrderID(UUID.fromString(orderId), false);
+        Transaction transaction = Transaction.builder().ticker(symbol).transactionType(order.getSide().toString()).qty(Double.parseDouble(order.getFilledQty())).exit(exit).submittedTimestamp(LocalDateTime.now()).build();
+        transactionRepository.save(transaction);
+        return order.getFilledQty();
     }
 
-    private String sell(String qty, String symbol, boolean shortSell) throws ApiException {
+    private String sell(String qty, String symbol, boolean exit, boolean shortSell) throws ApiException {
         if (shortSell){
-            return sell(String.valueOf(Math.floor(Double.parseDouble(qty))), symbol);
+            return sell(String.valueOf(Math.floor(Double.parseDouble(qty))), symbol, exit);
         }
-        return sell(qty, symbol);
+        return sell(qty, symbol, exit);
     }
 }
