@@ -29,9 +29,11 @@ public class ScheduledNewsCall {
 
     @Scheduled(fixedRate = 15000)
     public void makeNewsCall() throws Exception {
+        logger.info("Scheduled article call...");
+        logger.info("Market open: {}", alpacaClient.isMarketOpen());
         ArticleSentiment articleSentiment = sentimentService.callArticleSentiment();
         ArticleSentiment lastArticleSentiment = articleSentimentRepository.findTopByOrderByCreatedDesc();
-        if (lastArticleSentiment == null || !lastArticleSentiment.getArticle().equals(articleSentiment.getArticle())){
+        if (alpacaClient.isMarketOpen() && (lastArticleSentiment == null || !lastArticleSentiment.getArticle().equals(articleSentiment.getArticle()))){
             articleSentimentRepository.save(articleSentiment);
             logger.info("Ticker: {}  Publisher: {}, Score: {}, Article: {}", articleSentiment.getTicker(), articleSentiment.getPublisher(), articleSentiment.getScore(), articleSentiment.getArticle());
             double score = articleSentiment.getScore();

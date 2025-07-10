@@ -36,6 +36,11 @@ public class AlpacaClient {
     final TraderAPIEndpointType endpointType = TraderAPIEndpointType.PAPER;
     final MarketDataWebsocketSourceType sourceType = MarketDataWebsocketSourceType.IEX;
 
+    public boolean isMarketOpen() throws ApiException {
+        AlpacaAPI alpacaAPI = new AlpacaAPI(keyID, secretKey, endpointType, sourceType);
+        return Boolean.TRUE.equals(alpacaAPI.trader().clock().getClock().getIsOpen());
+    }
+
     public double getQtyFromPrice(String symbol, double price, boolean sale) throws net.jacobpeterson.alpaca.openapi.marketdata.ApiException {
         double raw = price/getLatestTradePrice(symbol);
         return sale?Math.floor(raw): raw;
