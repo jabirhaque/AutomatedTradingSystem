@@ -35,7 +35,7 @@ public class ScheduledNewsCall {
         ArticleSentiment lastArticleSentiment = articleSentimentRepository.findTopByOrderByCreatedDesc();
         if (alpacaClient.isMarketOpen() && (lastArticleSentiment == null || !lastArticleSentiment.getArticle().equals(articleSentiment.getArticle()))){
             articleSentimentRepository.save(articleSentiment);
-            logger.info("Ticker: {}  Publisher: {}, Score: {}, Article: {}", articleSentiment.getTicker(), articleSentiment.getPublisher(), articleSentiment.getScore(), articleSentiment.getArticle());
+            logger.info("Ticker: {}  Publisher: {}, Score: {}", articleSentiment.getTicker(), articleSentiment.getPublisher(), articleSentiment.getScore());
             double score = articleSentiment.getScore();
             String ticker = articleSentiment.getTicker();
             if (score>0){
