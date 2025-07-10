@@ -25,19 +25,16 @@ public class AlpacaClient {
     @Autowired
     private TransactionRepository transactionRepository;
 
-    @Value("${alpaca.api.keyID}")
-    private String keyID;
+    private final AlpacaAPI alpacaAPI;
 
-    @Value("${alpaca.api.secretKey}")
-    private String secretKey;
-    
-    Logger logger = LoggerFactory.getLogger(AlpacaClient.class);
+    private final Logger logger;
 
-    final TraderAPIEndpointType endpointType = TraderAPIEndpointType.PAPER;
-    final MarketDataWebsocketSourceType sourceType = MarketDataWebsocketSourceType.IEX;
+    AlpacaClient(@Value("${alpaca.api.keyID}") String keyId, @Value("${alpaca.api.secretKey}") String secretKey){
+        this.alpacaAPI = new AlpacaAPI(keyId, secretKey, TraderAPIEndpointType.PAPER, MarketDataWebsocketSourceType.IEX);
+        this.logger = LoggerFactory.getLogger(AlpacaClient.class);
+    }
 
     public boolean isMarketOpen() throws ApiException {
-        AlpacaAPI alpacaAPI = new AlpacaAPI(keyID, secretKey, endpointType, sourceType);
         return Boolean.TRUE.equals(alpacaAPI.trader().clock().getClock().getIsOpen());
     }
 
@@ -47,12 +44,10 @@ public class AlpacaClient {
     }
 
     public double getLatestTradePrice(String symbol) throws net.jacobpeterson.alpaca.openapi.marketdata.ApiException {
-        AlpacaAPI alpacaAPI = new AlpacaAPI(keyID, secretKey, endpointType, sourceType);
         return alpacaAPI.marketData().stock().stockLatestTradeSingle(symbol, StockFeed.IEX, null).getTrade().getP();
     }
 
     public String getQtyFromPosition(String symbol) throws ApiException {
-        AlpacaAPI alpacaAPI = new AlpacaAPI(keyID, secretKey, endpointType, sourceType);
         List<String> list = alpacaAPI.trader().positions().getAllOpenPositions().stream().map(Position::getSymbol).toList();
         if (list.contains(symbol)){
             return alpacaAPI.trader().positions().getOpenPosition(symbol).getQty();
@@ -99,7 +94,6 @@ public class AlpacaClient {
     }
 
     public void clearPosition(String symbol, boolean exit) throws ApiException {
-        AlpacaAPI alpacaAPI = new AlpacaAPI(keyID, secretKey, endpointType, sourceType);
         String qty = alpacaAPI.trader().positions().getOpenPosition(symbol).getQty();
         logger.info("Clearing {} of {}", qty, symbol);
         Order order = alpacaAPI.trader().positions().deleteOpenPosition(symbol,  null, new BigDecimal("100"));
@@ -108,7 +102,6 @@ public class AlpacaClient {
     }
 
     private String buy(String qty, String symbol, boolean exit) throws ApiException {
-        AlpacaAPI alpacaAPI = new AlpacaAPI(keyID, secretKey, endpointType, sourceType);
         logger.info("Buying {} of {}", qty, symbol);
         String orderId = alpacaAPI.trader().orders()
                 .postOrder(new PostOrderRequest()
@@ -129,7 +122,6 @@ public class AlpacaClient {
     }
 
     private String sell(String qty, String symbol, boolean exit) throws ApiException {
-        AlpacaAPI alpacaAPI = new AlpacaAPI(keyID, secretKey, endpointType, sourceType);
         logger.info("Selling {} of {}", qty, symbol);
         String orderId = alpacaAPI.trader().orders()
                 .postOrder(new PostOrderRequest()

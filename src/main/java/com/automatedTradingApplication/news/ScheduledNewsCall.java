@@ -45,7 +45,7 @@ public class ScheduledNewsCall {
                     try {
                         alpacaClient.partitionedSale(qty, ticker, true);
                     } catch (Exception e) {
-                        logger.debug(e.toString());
+                        logger.debug("Error in the sale request of {} of {}", qty, ticker);
                     }
                 };
                 LocalDateTime scheduledTime = LocalDateTime.now().plusSeconds(60);
@@ -57,7 +57,7 @@ public class ScheduledNewsCall {
                     try {
                         alpacaClient.partitionedBuy(resultQty, ticker, true);
                     } catch (Exception e) {
-                        logger.debug(e.toString());
+                        logger.debug("Error in the purchase request of {} of {}", qty, ticker);
                     }
                 };
                 LocalDateTime scheduledTime = LocalDateTime.now().plusSeconds(60);
