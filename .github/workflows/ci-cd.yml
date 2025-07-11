@@ -20,6 +20,13 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
+      - name: Set environment variables
+        run: |
+          echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> $GITHUB_ENV
+          echo "POLYGON_API_KEY=${{ secrets.POLYGON_API_KEY }}" >> $GITHUB_ENV
+          echo "ALPACA_API_KEY_ID=${{ secrets.ALPACA_API_KEY_ID }}" >> $GITHUB_ENV
+          echo "ALPACA_API_SECRET_KEY=${{ secrets.ALPACA_API_SECRET_KEY }}" >> $GITHUB_ENV
+
       - name: Build with Maven
         run: mvn clean install
 
