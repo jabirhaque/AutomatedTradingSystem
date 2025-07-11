@@ -1,11 +1,14 @@
 package com.automatedTradingApplication.news;
 
+import com.automatedTradingApplication.ScheduledTaskExecutor;
 import com.automatedTradingApplication.alpaca.AlpacaClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
 
 @Component
 public class ScheduledNewsCall {
@@ -19,23 +22,46 @@ public class ScheduledNewsCall {
     @Autowired
     private ArticleSentimentRepository articleSentimentRepository;
 
+    @Autowired
+    private ScheduledTaskExecutor scheduledTaskExecutor;
+
     Logger logger = LoggerFactory.getLogger(ScheduledNewsCall.class);
 
-    @Scheduled(fixedRate = 12000)
+    @Scheduled(fixedRate = 15000)
     public void makeNewsCall() throws Exception {
+        logger.info("Scheduled article call...");
+        logger.info("Market open: {}", alpacaClient.isMarketOpen());
         ArticleSentiment articleSentiment = sentimentService.callArticleSentiment();
         ArticleSentiment lastArticleSentiment = articleSentimentRepository.findTopByOrderByCreatedDesc();
-        if (lastArticleSentiment == null || !lastArticleSentiment.getArticle().equals(articleSentiment.getArticle())){
+        if (alpacaClient.isMarketOpen() && (lastArticleSentiment == null || !lastArticleSentiment.getArticle().equals(articleSentiment.getArticle()))){
             articleSentimentRepository.save(articleSentiment);
-            logger.info("Ticker: {}  Publisher: {}, Score: {}, Article: {}", articleSentiment.getTicker(), articleSentiment.getPublisher(), articleSentiment.getScore(), articleSentiment.getArticle());
+            logger.info("Ticker: {}  Publisher: {}, Score: {}", articleSentiment.getTicker(), articleSentiment.getPublisher(), articleSentiment.getScore());
             double score = articleSentiment.getScore();
             String ticker = articleSentiment.getTicker();
             if (score>0){
-                String volume = String.valueOf(Math.round((score*10000) * 100.0) / 100.0);
-                alpacaClient.buyVolume(volume, ticker);
+                String qty = String.valueOf(alpacaClient.getQtyFromPrice(ticker,score*10000));
+                alpacaClient.partitionedBuy(qty, ticker, false);
+                Runnable sellBackTask = () -> {
+                    try {
+                        alpacaClient.partitionedSale(qty, ticker, true);
+                    } catch (Exception e) {
+                        logger.debug("Error in the sale request of {} of {}", qty, ticker);
+                    }
+                };
+                LocalDateTime scheduledTime = LocalDateTime.now().plusSeconds(60);
+                scheduledTaskExecutor.scheduleTaskAtSpecificTime(sellBackTask, scheduledTime);
             }else{
-                double volume = Math.round((score*-1000) * 100.0) / 100.0;
-                alpacaClient.shortVolume(volume, ticker);
+                String qty = String.valueOf(alpacaClient.getQtyFromPrice(ticker, score*-10000));
+                String resultQty = alpacaClient.partitionedSale(qty, ticker, false);
+                Runnable buyBackTask = () -> {
+                    try {
+                        alpacaClient.partitionedBuy(resultQty, ticker, true);
+                    } catch (Exception e) {
+                        logger.debug("Error in the purchase request of {} of {}", qty, ticker);
+                    }
+                };
+                LocalDateTime scheduledTime = LocalDateTime.now().plusSeconds(60);
+                scheduledTaskExecutor.scheduleTaskAtSpecificTime(buyBackTask, scheduledTime);
             }
         }
     }
