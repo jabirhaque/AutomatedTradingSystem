@@ -38,9 +38,8 @@ public class AlpacaClient {
         return Boolean.TRUE.equals(alpacaAPI.trader().clock().getClock().getIsOpen());
     }
 
-    public double getQtyFromPrice(String symbol, double price, boolean sale) throws net.jacobpeterson.alpaca.openapi.marketdata.ApiException {
-        double raw = price/getLatestTradePrice(symbol);
-        return sale?Math.floor(raw): raw;
+    public double getQtyFromPrice(String symbol, double price) throws net.jacobpeterson.alpaca.openapi.marketdata.ApiException {
+        return price/getLatestTradePrice(symbol);
     }
 
     public double getLatestTradePrice(String symbol) throws net.jacobpeterson.alpaca.openapi.marketdata.ApiException {

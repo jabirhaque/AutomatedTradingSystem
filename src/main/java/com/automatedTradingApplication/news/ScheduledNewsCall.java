@@ -39,7 +39,7 @@ public class ScheduledNewsCall {
             double score = articleSentiment.getScore();
             String ticker = articleSentiment.getTicker();
             if (score>0){
-                String qty = String.valueOf(alpacaClient.getQtyFromPrice(ticker,score*10000 , false));
+                String qty = String.valueOf(alpacaClient.getQtyFromPrice(ticker,score*10000));
                 alpacaClient.partitionedBuy(qty, ticker, false);
                 Runnable sellBackTask = () -> {
                     try {
@@ -51,7 +51,7 @@ public class ScheduledNewsCall {
                 LocalDateTime scheduledTime = LocalDateTime.now().plusSeconds(60);
                 scheduledTaskExecutor.scheduleTaskAtSpecificTime(sellBackTask, scheduledTime);
             }else{
-                String qty = String.valueOf(alpacaClient.getQtyFromPrice(ticker, score*-10000, false));
+                String qty = String.valueOf(alpacaClient.getQtyFromPrice(ticker, score*-10000));
                 String resultQty = alpacaClient.partitionedSale(qty, ticker, false);
                 Runnable buyBackTask = () -> {
                     try {
