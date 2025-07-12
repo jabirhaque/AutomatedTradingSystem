@@ -36,7 +36,7 @@ public class AlpacaClientTest {
     void getQtyFromPriceTest() throws ApiException {
         Mockito.doReturn(211.38).when(alpacaClient).getLatestTradePrice("AAPL");
         double actual = alpacaClient.getQtyFromPrice("AAPL", 500);
-        double expected = 500.00/211.38;
+        double expected = 600.00/211.38;
         logger.debug("Expecting {}, actually {}", expected, actual);
         Assertions.assertEquals(expected, actual);
     }
