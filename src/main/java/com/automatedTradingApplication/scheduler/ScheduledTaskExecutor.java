@@ -1,9 +1,7 @@
-package com.automatedTradingApplication;
+package com.automatedTradingApplication.scheduler;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

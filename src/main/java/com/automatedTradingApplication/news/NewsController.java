@@ -1,6 +1,7 @@
 package com.automatedTradingApplication.news;
 
 
+import com.automatedTradingApplication.NLP.SentimentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

@@ -1,5 +1,8 @@
-package com.automatedTradingApplication.news;
+package com.automatedTradingApplication.NLP;
 
+import com.automatedTradingApplication.news.ArticleSentiment;
+import com.automatedTradingApplication.news.JsonAttributeExtractor;
+import com.automatedTradingApplication.news.NewsClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
