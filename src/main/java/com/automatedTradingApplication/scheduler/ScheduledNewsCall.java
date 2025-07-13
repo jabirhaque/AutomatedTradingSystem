@@ -1,5 +1,6 @@
 package com.automatedTradingApplication.scheduler;
 
+import com.automatedTradingApplication.alpaca.AlpacaApiWrapper;
 import com.automatedTradingApplication.alpaca.AlpacaClient;
 import com.automatedTradingApplication.news.ArticleSentiment;
 import com.automatedTradingApplication.news.ArticleSentimentRepository;
@@ -22,6 +23,9 @@ public class ScheduledNewsCall {
     private AlpacaClient alpacaClient;
 
     @Autowired
+    private AlpacaApiWrapper alpacaApiWrapper;
+
+    @Autowired
     private ArticleSentimentRepository articleSentimentRepository;
 
     @Autowired
@@ -35,10 +39,11 @@ public class ScheduledNewsCall {
     @Scheduled(fixedRate = 15000)
     public void makeNewsCall() throws Exception {
         logger.info("Scheduled article call...");
-        logger.info("Market open: {}", alpacaClient.isMarketOpen());
+        boolean marketOpen = alpacaApiWrapper.isMarketOpen();
+        logger.info("Market open: {}", marketOpen);
         ArticleSentiment articleSentiment = sentimentService.callArticleSentiment();
         ArticleSentiment lastArticleSentiment = articleSentimentRepository.findTopByOrderByCreatedDesc();
-        if (alpacaClient.isMarketOpen() && (lastArticleSentiment == null || !lastArticleSentiment.getArticle().equals(articleSentiment.getArticle()))){
+        if (marketOpen && (lastArticleSentiment == null || !lastArticleSentiment.getArticle().equals(articleSentiment.getArticle()))){
             articleSentimentRepository.save(articleSentiment);
             logger.info("Ticker: {}  Publisher: {}, Score: {}", articleSentiment.getTicker(), articleSentiment.getPublisher(), articleSentiment.getScore());
             double score = articleSentiment.getScore();

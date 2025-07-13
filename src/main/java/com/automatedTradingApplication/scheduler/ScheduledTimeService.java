@@ -1,6 +1,6 @@
 package com.automatedTradingApplication.scheduler;
 
-import com.automatedTradingApplication.alpaca.AlpacaClient;
+import com.automatedTradingApplication.alpaca.AlpacaApiWrapper;
 import net.jacobpeterson.alpaca.openapi.trader.ApiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,13 +14,13 @@ import java.time.LocalDateTime;
 public class ScheduledTimeService {
 
     @Autowired
-    private AlpacaClient alpacaClient;
+    private AlpacaApiWrapper alpacaApiWrapper;
 
     Logger logger = LoggerFactory.getLogger(ScheduledTimeService.class);
 
     public LocalDateTime getScheduledExitTime(LocalDateTime now) throws ApiException {
-        LocalDateTime closeTime = alpacaClient.nextClosing();
-        LocalDateTime openingTime = alpacaClient.nextOpening();
+        LocalDateTime closeTime = alpacaApiWrapper.nextClosing();
+        LocalDateTime openingTime = alpacaApiWrapper.nextOpening();
         Duration duration = Duration.between(closeTime, now);
         LocalDateTime result = openingTime.plusMinutes(390).minusMinutes(Math.abs(duration.toMinutes()));
         logger.info("Scheduling event for: {}", result);

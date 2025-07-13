@@ -15,16 +15,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class AlpacaClientTest {
 
     @Mock
-    AlpacaAPI alpacaAPI;
-
-    @Mock
     TransactionRepository transactionRepository;
 
-    @Spy
+    @Mock
+    AlpacaApiWrapper alpacaApiWrapper;
+
     @InjectMocks
     AlpacaClient alpacaClient;
-
-    Logger logger = LoggerFactory.getLogger(AlpacaClientTest.class);
 
     @BeforeEach
     void setUp() {
@@ -33,10 +30,9 @@ public class AlpacaClientTest {
 
     @Test
     void getQtyFromPriceTest() throws ApiException {
-        Mockito.doReturn(211.38).when(alpacaClient).getLatestTradePrice("AAPL");
+        Mockito.when(alpacaApiWrapper.getLatestTradePrice("AAPL")).thenReturn(211.38);
         double actual = alpacaClient.getQtyFromPrice("AAPL", 500);
         double expected = 500.00/211.38;
-        logger.debug("Expecting {}, actually {}", expected, actual);
         Assertions.assertEquals(expected, actual);
     }
 }
