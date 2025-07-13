@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class Transaction {
     @Id
     private String id;
-    private String ticker;
+    private String symbol;
     private String transactionType;
     private double qty;
     private double notional;
