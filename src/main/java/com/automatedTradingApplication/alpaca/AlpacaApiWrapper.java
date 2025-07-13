@@ -7,16 +7,16 @@ import net.jacobpeterson.alpaca.openapi.marketdata.model.StockFeed;
 import net.jacobpeterson.alpaca.openapi.trader.ApiException;
 import net.jacobpeterson.alpaca.openapi.trader.model.*;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Service
+@Component
 public class AlpacaApiWrapper {
     /**
-     * Wrapper service for the AlpacaAPI dependency, allow for dependency injection and thus better testing
+     * Wrapper service for the AlpacaAPI dependency, enabling dependency injection and thus better testing
      * As this class simply calls the AlpacaAPI class, testing is not necessary for this component
      * This class should NOT contain any logic further than AlpacaAPI calls
      */

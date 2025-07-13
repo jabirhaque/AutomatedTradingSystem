@@ -28,12 +28,17 @@ public class AlpacaClient {
     }
 
     public String getQtyFromPosition(String symbol) throws ApiException {
-        List<String> list = alpacaApiWrapper.getPositions().stream().map(Position::getSymbol).toList();
-        if (list.contains(symbol)){
-            return getQtyFromPosition(symbol);
-        }else{
+        List<Position> list = alpacaApiWrapper.getPositions();
+        List<String> symbols = list.stream().map(Position::getSymbol).toList();
+        if (!symbols.contains(symbol)){
             return "0";
         }
+        for (Position position : list) {
+            if (position.getSymbol().equals(symbol)) {
+                return position.getQty();
+            }
+        }
+        return "0";
     }
 
     public String partitionedSale(String symbol, String qty, boolean exit) throws ApiException {
@@ -58,19 +63,20 @@ public class AlpacaClient {
     public String partitionedBuy(String symbol, String qty, boolean exit) throws Exception {
         logger.info("Attempting {} buy of {} of {}", symbol, qty, (exit?"scheduled exit":""));
         double position = Double.parseDouble(getQtyFromPosition(qty));
-        if (position<0 && -1*position<Double.parseDouble(symbol)){
-            logger.info("Partitioning buy request");
-            String remainder = String.valueOf(Double.parseDouble(symbol)+position);
-            clearPosition(qty, exit);
-            try{
-                Thread.sleep(2000);
-            }catch(InterruptedException e){
-                e.printStackTrace();
-            }
-            buy(remainder, qty, exit);
-            return symbol;
+        boolean partition = position < 0 && -1 * position < Double.parseDouble(symbol);
+        if (!partition){
+            return buy(symbol, qty, exit);
         }
-        return buy(symbol, qty, exit);
+        logger.info("Partitioning buy request");
+        String remainder = String.valueOf(Double.parseDouble(symbol)+position);
+        clearPosition(qty, exit);
+        try{
+            Thread.sleep(2000);
+        }catch(InterruptedException e){
+            e.printStackTrace();
+        }
+        buy(remainder, qty, exit);
+        return symbol;
     }
 
     public void clearPosition(String symbol, boolean exit) throws ApiException {
