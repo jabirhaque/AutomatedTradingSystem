@@ -1,6 +1,5 @@
 package com.automatedTradingApplication.alpaca;
 
-import com.automatedTradingApplication.news.ScheduledNewsCall;
 import com.automatedTradingApplication.transaction.TransactionRepository;
 import net.jacobpeterson.alpaca.AlpacaAPI;
 import net.jacobpeterson.alpaca.openapi.marketdata.ApiException;

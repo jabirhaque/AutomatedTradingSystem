@@ -34,6 +34,14 @@ public class AlpacaClient {
         this.logger = LoggerFactory.getLogger(AlpacaClient.class);
     }
 
+    public LocalDateTime nextOpening() throws ApiException {
+        return alpacaAPI.trader().clock().getClock().getNextOpen().toLocalDateTime().plusHours(5);
+    }
+
+    public LocalDateTime nextClosing() throws ApiException {
+        return alpacaAPI.trader().clock().getClock().getNextClose().toLocalDateTime().plusHours(5);
+    }
+
     public boolean isMarketOpen() throws ApiException {
         return Boolean.TRUE.equals(alpacaAPI.trader().clock().getClock().getIsOpen());
     }

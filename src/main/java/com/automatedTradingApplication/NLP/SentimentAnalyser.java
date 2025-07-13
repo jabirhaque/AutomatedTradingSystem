@@ -1,4 +1,4 @@
-package com.automatedTradingApplication.news;
+package com.automatedTradingApplication.NLP;
 
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations;

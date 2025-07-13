@@ -1,7 +1,9 @@
-package com.automatedTradingApplication.news;
+package com.automatedTradingApplication.scheduler;
 
-import com.automatedTradingApplication.ScheduledTaskExecutor;
 import com.automatedTradingApplication.alpaca.AlpacaClient;
+import com.automatedTradingApplication.news.ArticleSentiment;
+import com.automatedTradingApplication.news.ArticleSentimentRepository;
+import com.automatedTradingApplication.NLP.SentimentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,9 @@ public class ScheduledNewsCall {
 
     @Autowired
     private ScheduledTaskExecutor scheduledTaskExecutor;
+
+    @Autowired
+    ScheduledTimeService scheduledTimeService;
 
     Logger logger = LoggerFactory.getLogger(ScheduledNewsCall.class);
 
@@ -48,7 +53,7 @@ public class ScheduledNewsCall {
                         logger.debug("Error in the sale request of {} of {}", qty, ticker);
                     }
                 };
-                LocalDateTime scheduledTime = LocalDateTime.now().plusSeconds(60);
+                LocalDateTime scheduledTime = scheduledTimeService.getScheduledExitTime(LocalDateTime.now());
                 scheduledTaskExecutor.scheduleTaskAtSpecificTime(sellBackTask, scheduledTime);
             }else{
                 String qty = String.valueOf(alpacaClient.getQtyFromPrice(ticker, score*-10000));
@@ -60,7 +65,7 @@ public class ScheduledNewsCall {
                         logger.debug("Error in the purchase request of {} of {}", qty, ticker);
                     }
                 };
-                LocalDateTime scheduledTime = LocalDateTime.now().plusSeconds(60);
+                LocalDateTime scheduledTime = scheduledTimeService.getScheduledExitTime(LocalDateTime.now());
                 scheduledTaskExecutor.scheduleTaskAtSpecificTime(buyBackTask, scheduledTime);
             }
         }
