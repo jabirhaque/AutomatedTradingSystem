@@ -45,29 +45,29 @@ public class ScheduledNewsCall {
         ArticleSentiment lastArticleSentiment = articleSentimentRepository.findTopByOrderByCreatedDesc();
         if (marketOpen && (lastArticleSentiment == null || !lastArticleSentiment.getArticle().equals(articleSentiment.getArticle()))){
             articleSentimentRepository.save(articleSentiment);
-            logger.info("Ticker: {}  Publisher: {}, Score: {}", articleSentiment.getTicker(), articleSentiment.getPublisher(), articleSentiment.getScore());
+            logger.info("Symbol: {}  Publisher: {}, Score: {}", articleSentiment.getSymbol(), articleSentiment.getPublisher(), articleSentiment.getScore());
             double score = articleSentiment.getScore();
-            String ticker = articleSentiment.getTicker();
+            String symbol = articleSentiment.getSymbol();
             if (score>0){
-                String qty = String.valueOf(alpacaClient.getQtyFromPrice(ticker,score*10000));
-                alpacaClient.partitionedBuy(qty, ticker, false);
+                String qty = String.valueOf(alpacaClient.getQtyFromPrice(symbol,score*10000));
+                alpacaClient.partitionedBuy(symbol, qty, false);
                 Runnable sellBackTask = () -> {
                     try {
-                        alpacaClient.partitionedSale(qty, ticker, true);
+                        alpacaClient.partitionedSale(symbol, qty, true);
                     } catch (Exception e) {
-                        logger.debug("Error in the sale request of {} of {}", qty, ticker);
+                        logger.debug("Error in the sale request of {} of {}", qty, symbol);
                     }
                 };
                 LocalDateTime scheduledTime = scheduledTimeService.getScheduledExitTime(LocalDateTime.now());
                 scheduledTaskExecutor.scheduleTaskAtSpecificTime(sellBackTask, scheduledTime);
             }else{
-                String qty = String.valueOf(alpacaClient.getQtyFromPrice(ticker, score*-10000));
-                String resultQty = alpacaClient.partitionedSale(qty, ticker, false);
+                String qty = String.valueOf(alpacaClient.getQtyFromPrice(symbol, score*-10000));
+                String resultQty = alpacaClient.partitionedSale(symbol, qty, false);
                 Runnable buyBackTask = () -> {
                     try {
-                        alpacaClient.partitionedBuy(resultQty, ticker, true);
+                        alpacaClient.partitionedBuy(symbol, resultQty, true);
                     } catch (Exception e) {
-                        logger.debug("Error in the purchase request of {} of {}", qty, ticker);
+                        logger.debug("Error in the purchase request of {} of {}", qty, symbol);
                     }
                 };
                 LocalDateTime scheduledTime = scheduledTimeService.getScheduledExitTime(LocalDateTime.now());

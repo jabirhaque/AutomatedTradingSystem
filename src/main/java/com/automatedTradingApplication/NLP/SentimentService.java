@@ -27,9 +27,9 @@ public class SentimentService {
         String jsonString = response.getBody();
         String article = jsonAttributeExtractor.extractTitle(jsonString) + " " + jsonAttributeExtractor.extractDescription(jsonString);
         String publisher = jsonAttributeExtractor.extractPublisherName(jsonString);
-        List<String> tickers = jsonAttributeExtractor.extractTickers(jsonString);
+        List<String> symbols = jsonAttributeExtractor.extractSymbols(jsonString);
         double sentiment = sentimentAnalyser.analyzeSentiment(article);
 
-        return ArticleSentiment.builder().article(article).publisher(publisher).score(sentiment).ticker(tickers.getFirst()).created(LocalDateTime.now()).build();
+        return ArticleSentiment.builder().article(article).publisher(publisher).score(sentiment).symbol(symbols.getFirst()).created(LocalDateTime.now()).build();
     }
 }

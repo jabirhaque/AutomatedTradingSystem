@@ -22,8 +22,8 @@ public class JsonAttributeExtractor {
         return extractAttribute(jsonString, "\"published_utc\"\\s*:\\s*\"([^\"]*)\"");
     }
 
-    public List<String> extractTickers(String jsonString) {
-        return extractTickers(jsonString, "\"tickers\"\\s*:\\s*\\[([^\\]]*)\\]");
+    public List<String> extractSymbols(String jsonString) {
+        return extractSymbols(jsonString, "\"tickers\"\\s*:\\s*\\[([^\\]]*)\\]");
     }
 
     public String extractDescription(String jsonString) {
@@ -39,10 +39,10 @@ public class JsonAttributeExtractor {
         return null;
     }
 
-    private List<String> extractTickers(String jsonString, String regex) {
-        String tickersString = extractAttribute(jsonString, regex);
-        if (tickersString != null) {
-            return Arrays.asList(tickersString.replaceAll("\"", "").split(","));
+    private List<String> extractSymbols(String jsonString, String regex) {
+        String symbolsString = extractAttribute(jsonString, regex);
+        if (symbolsString != null) {
+            return Arrays.asList(symbolsString.replaceAll("\"", "").split(","));
         }
         return null;
     }

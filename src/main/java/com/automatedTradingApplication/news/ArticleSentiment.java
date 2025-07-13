@@ -16,6 +16,6 @@ public class ArticleSentiment {
     private String article;
     private String publisher;
     private double score;
-    private String ticker;
+    private String symbol;
     private LocalDateTime created;
 }
