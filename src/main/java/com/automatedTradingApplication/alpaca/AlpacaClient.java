@@ -53,11 +53,11 @@ public class AlpacaClient {
             }catch(InterruptedException e){
                 e.printStackTrace();
             }
-            return String.valueOf(Double.parseDouble(sell(remainder, symbol, exit, true))+position);
+            return String.valueOf(Double.parseDouble(shortSell(remainder, symbol, exit))+position);
         }if (position>Double.parseDouble(qty)){
             return sell(qty, symbol, exit);
         }
-        return sell(qty, symbol, exit, true);
+        return shortSell(qty, symbol, exit);
     }
 
     public String partitionedBuy(String symbol, String qty, boolean exit) throws Exception {
@@ -87,7 +87,7 @@ public class AlpacaClient {
         transactionRepository.save(transaction);
     }
 
-    private String buy(String qty, String symbol, boolean exit) throws ApiException {
+    public String buy(String qty, String symbol, boolean exit) throws ApiException {
         logger.info("Buying {} of {}", qty, symbol);
         Order order = alpacaApiWrapper.buy(symbol, qty);
         try{
@@ -100,7 +100,7 @@ public class AlpacaClient {
         return order.getFilledQty();
     }
 
-    private String sell(String qty, String symbol, boolean exit) throws ApiException {
+    public String sell(String qty, String symbol, boolean exit) throws ApiException {
         logger.info("Selling {} of {}", qty, symbol);
         Order order = alpacaApiWrapper.sell(symbol, qty);
         try{
@@ -113,10 +113,7 @@ public class AlpacaClient {
         return order.getFilledQty();
     }
 
-    private String sell(String qty, String symbol, boolean exit, boolean shortSell) throws ApiException {
-        if (shortSell){
-            return sell(String.valueOf(Math.floor(Double.parseDouble(qty))), symbol, exit);
-        }
-        return sell(qty, symbol, exit);
+    public String shortSell(String qty, String symbol, boolean exit) throws ApiException {
+        return sell(String.valueOf(Math.floor(Double.parseDouble(qty))), symbol, exit);
     }
 }

@@ -2,6 +2,8 @@ package com.automatedTradingApplication.alpaca;
 
 import com.automatedTradingApplication.transaction.TransactionRepository;
 import net.jacobpeterson.alpaca.openapi.marketdata.ApiException;
+import net.jacobpeterson.alpaca.openapi.trader.model.Order;
+import net.jacobpeterson.alpaca.openapi.trader.model.OrderSide;
 import net.jacobpeterson.alpaca.openapi.trader.model.Position;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,10 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 
 @SpringBootTest
-public class AlpacaClientTest {
-    /**
-     * TODO: When testing for sell/buy/clear orders, setup a mock database to assert successful persistence, e.g. H2
-     */
+public class AlpacaClientTest{
 
     @Mock
     TransactionRepository transactionRepository;
@@ -81,5 +80,59 @@ public class AlpacaClientTest {
         String expected = "0";
         String actual = alpacaClient.getQtyFromPosition("NVDA");
         Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void buyTest() throws net.jacobpeterson.alpaca.openapi.trader.ApiException {
+        String qty = "10";
+        String symbol = "AAPL";
+        boolean exit = false;
+
+        Order mockOrder = new Order();
+        mockOrder.setSide(OrderSide.BUY);
+        mockOrder.setFilledQty(qty);
+
+        Mockito.when(alpacaApiWrapper.buy(symbol, qty)).thenReturn(mockOrder);
+
+        String filledQty = alpacaClient.buy(qty, symbol, exit);
+
+        Mockito.verify(alpacaApiWrapper, Mockito.times(1)).buy(symbol, qty);
+        Assertions.assertEquals(qty, filledQty);
+    }
+
+    @Test
+    void sellTest() throws net.jacobpeterson.alpaca.openapi.trader.ApiException {
+        String qty = "10";
+        String symbol = "AAPL";
+        boolean exit = false;
+
+        Order mockOrder = new Order();
+        mockOrder.setSide(OrderSide.SELL);
+        mockOrder.setFilledQty(qty);
+
+        Mockito.when(alpacaApiWrapper.sell(symbol, qty)).thenReturn(mockOrder);
+
+        String filledQty = alpacaClient.sell(qty, symbol, exit);
+
+        Mockito.verify(alpacaApiWrapper, Mockito.times(1)).sell(symbol, qty);
+        Assertions.assertEquals(qty, filledQty);
+    }
+
+    @Test
+    void shortSellTest() throws net.jacobpeterson.alpaca.openapi.trader.ApiException {
+        String qty = "10.5";
+        String symbol = "AAPL";
+        boolean exit = false;
+
+        Order mockOrder = new Order();
+        mockOrder.setSide(OrderSide.SELL);
+        mockOrder.setFilledQty("10.0");
+
+        Mockito.when(alpacaApiWrapper.sell(symbol, "10.0")).thenReturn(mockOrder);
+
+        String filledQty = alpacaClient.shortSell(qty, symbol, exit);
+
+        Mockito.verify(alpacaApiWrapper, Mockito.times(1)).sell(symbol, "10.0");
+        Assertions.assertEquals("10.0", filledQty);
     }
 }
