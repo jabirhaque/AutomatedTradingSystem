@@ -135,4 +135,20 @@ public class AlpacaClientTest{
         Mockito.verify(alpacaApiWrapper, Mockito.times(1)).sell(symbol, "10.0");
         Assertions.assertEquals("10.0", filledQty);
     }
+
+    @Test
+    void clearPositionTest() throws net.jacobpeterson.alpaca.openapi.trader.ApiException {
+        String symbol = "AAPL";
+
+        Order mockOrder = new Order();
+        mockOrder.setSide(OrderSide.SELL);
+        mockOrder.setFilledQty("10");
+
+        Mockito.when(alpacaApiWrapper.clearPosition(symbol)).thenReturn(mockOrder);
+
+        String filledQty = alpacaClient.clearPosition(symbol, false);
+
+        Mockito.verify(alpacaApiWrapper, Mockito.times(1)).clearPosition(symbol);
+        Assertions.assertEquals("10", filledQty);
+    }
 }

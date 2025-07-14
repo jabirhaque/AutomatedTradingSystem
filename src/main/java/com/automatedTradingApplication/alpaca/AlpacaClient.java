@@ -79,12 +79,13 @@ public class AlpacaClient {
         return symbol;
     }
 
-    public void clearPosition(String symbol, boolean exit) throws ApiException {
+    public String clearPosition(String symbol, boolean exit) throws ApiException {
         String qty = alpacaApiWrapper.getPositionFromSymbol(symbol);
         logger.info("Clearing {} of {}", qty, symbol);
         Order order = alpacaApiWrapper.clearPosition(symbol);
         Transaction transaction = Transaction.builder().symbol(symbol).transactionType(order.getSide().toString()).qty(Double.parseDouble(order.getFilledQty())).exit(exit).submittedTimestamp(LocalDateTime.now()).build();
         transactionRepository.save(transaction);
+        return order.getFilledQty();
     }
 
     public String buy(String qty, String symbol, boolean exit) throws ApiException {
