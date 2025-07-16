@@ -53,30 +53,30 @@ public class AlpacaClient {
             }catch(InterruptedException e){
                 e.printStackTrace();
             }
-            return String.valueOf(Double.parseDouble(shortSell(remainder, symbol, exit))+position);
+            return String.valueOf(Double.parseDouble(shortSell(symbol, remainder, exit))+position);
         }if (position>Double.parseDouble(qty)){
-            return sell(qty, symbol, exit);
+            return sell(symbol, qty, exit);
         }
-        return shortSell(qty, symbol, exit);
+        return shortSell(symbol, qty, exit);
     }
 
     public String partitionedBuy(String symbol, String qty, boolean exit) throws Exception {
         logger.info("Attempting {} buy of {} of {}", symbol, qty, (exit?"scheduled exit":""));
-        double position = Double.parseDouble(getQtyFromPosition(qty));
-        boolean partition = position < 0 && -1 * position < Double.parseDouble(symbol);
+        double position = Double.parseDouble(getQtyFromPosition(symbol));
+        boolean partition = position < 0 && -1 * position < Double.parseDouble(qty);
         if (!partition){
             return buy(symbol, qty, exit);
         }
         logger.info("Partitioning buy request");
-        String remainder = String.valueOf(Double.parseDouble(symbol)+position);
-        clearPosition(qty, exit);
+        String remainder = String.valueOf(Double.parseDouble(qty)+position);
+        String clear = clearPosition(symbol, exit);
         try{
             Thread.sleep(2000);
         }catch(InterruptedException e){
             e.printStackTrace();
         }
-        buy(remainder, qty, exit);
-        return symbol;
+        String buy = buy(symbol, remainder, exit);
+        return String.valueOf(Double.parseDouble(clear)+Double.parseDouble(buy));
     }
 
     public String clearPosition(String symbol, boolean exit) throws ApiException {
@@ -88,7 +88,7 @@ public class AlpacaClient {
         return order.getFilledQty();
     }
 
-    public String buy(String qty, String symbol, boolean exit) throws ApiException {
+    public String buy(String symbol, String qty, boolean exit) throws ApiException {
         logger.info("Buying {} of {}", qty, symbol);
         Order order = alpacaApiWrapper.buy(symbol, qty);
         try{
@@ -101,20 +101,20 @@ public class AlpacaClient {
         return order.getFilledQty();
     }
 
-    public String sell(String qty, String symbol, boolean exit) throws ApiException {
-        logger.info("Selling {} of {}", qty, symbol);
+    public String sell(String symbol, String qty, boolean exit) throws ApiException {
+        logger.info("Selling {} of {}", symbol, qty);
         Order order = alpacaApiWrapper.sell(symbol, qty);
         try{
             Thread.sleep(2000);
         } catch(InterruptedException e){
             e.printStackTrace();
         }
-        Transaction transaction = Transaction.builder().symbol(symbol).transactionType(order.getSide().toString()).qty(Double.parseDouble(order.getFilledQty())).exit(exit).submittedTimestamp(LocalDateTime.now()).build();
+        Transaction transaction = Transaction.builder().symbol(qty).transactionType(order.getSide().toString()).qty(Double.parseDouble(order.getFilledQty())).exit(exit).submittedTimestamp(LocalDateTime.now()).build();
         transactionRepository.save(transaction);
         return order.getFilledQty();
     }
 
-    public String shortSell(String qty, String symbol, boolean exit) throws ApiException {
-        return sell(String.valueOf(Math.floor(Double.parseDouble(qty))), symbol, exit);
+    public String shortSell(String symbol, String qty, boolean exit) throws ApiException {
+        return sell(symbol, String.valueOf(Math.floor(Double.parseDouble(qty))), exit);
     }
 }
