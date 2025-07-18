@@ -12,7 +12,7 @@ var option = {
         source: data
     },
     title: {
-        text: 'Data Amount: 200,000'
+        text: 'Portfolio performance'
     },
     tooltip: {
         trigger: 'axis',
@@ -204,6 +204,7 @@ export default function Chart() {
             notMerge={true}
             lazyUpdate={true}
             theme={"theme_name"}
+            style={{ width: '100%', height: 'calc(100vh - 100px)' }}
         />
     );
 }
