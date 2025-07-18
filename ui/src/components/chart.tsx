@@ -17,7 +17,15 @@ var option = {
     tooltip: {
         trigger: 'axis',
         axisPointer: {
-            type: 'line'
+            type: 'cross'
+        },
+        formatter: function (params) {
+            const [data] = params; // Assuming only one series
+            return `
+            ${data.axisValue}<br />
+            Open: ${data.data[1]}<br />
+            Close: ${data.data[2]}
+        `;
         }
     },
     toolbox: {
