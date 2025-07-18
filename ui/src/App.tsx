@@ -1,19 +1,5 @@
-import {useGetAllProductsQuery} from "./features/api.ts";
+import Chart from './components/chart';
 
 export default function App() {
-    const {data: allProductsData, isLoading} = useGetAllProductsQuery({});
-    if (isLoading) {
-        return(
-        <>
-            <p>Loading...</p>
-        </>
-    )}
-
-    console.log(allProductsData);
-
-    return (
-    <>
-        <p>Hello World</p>
-    </>
-  )
+    return <div className="chart-container"><Chart /></div>;
 }
