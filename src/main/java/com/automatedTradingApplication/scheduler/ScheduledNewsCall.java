@@ -38,6 +38,7 @@ public class ScheduledNewsCall {
 
     @Scheduled(fixedRate = 15000)
     public void makeNewsCall() throws Exception {
+        alpacaApiWrapper.portfolioHistory();
         logger.info("Scheduled article call...");
         boolean marketOpen = alpacaApiWrapper.isMarketOpen();
         logger.info("Market open: {}", marketOpen);
