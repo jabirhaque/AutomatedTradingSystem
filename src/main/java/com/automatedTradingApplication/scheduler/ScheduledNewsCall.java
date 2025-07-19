@@ -32,7 +32,7 @@ public class ScheduledNewsCall {
     private ScheduledTaskExecutor scheduledTaskExecutor;
 
     @Autowired
-    ScheduledTimeService scheduledTimeService;
+    private ScheduledTimeService scheduledTimeService;
 
     Logger logger = LoggerFactory.getLogger(ScheduledNewsCall.class);
 

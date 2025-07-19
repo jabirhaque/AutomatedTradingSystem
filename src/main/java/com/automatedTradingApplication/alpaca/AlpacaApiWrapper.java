@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Component
@@ -25,6 +26,18 @@ public class AlpacaApiWrapper {
 
     AlpacaApiWrapper(@Value("${alpaca.api.keyID}") String keyId, @Value("${alpaca.api.secretKey}") String secretKey){
         this.alpacaAPI = new AlpacaAPI(keyId, secretKey, TraderAPIEndpointType.PAPER, MarketDataWebsocketSourceType.IEX);
+    }
+
+    public PortfolioHistory portfolioHistoryWeek() throws ApiException {
+        return alpacaAPI.trader().portfolioHistory().getAccountPortfolioHistory(null, "1Min", "market_hours", OffsetDateTime.now().minusDays(7).plusSeconds(1), null, OffsetDateTime.now(), null, "false");
+    }
+
+    public PortfolioHistory portfolioHistoryMonth() throws ApiException {
+        return alpacaAPI.trader().portfolioHistory().getAccountPortfolioHistory(null, "15Min", "market_hours", OffsetDateTime.now().minusDays(30).plusSeconds(1), null, OffsetDateTime.now(), null, "false");
+    }
+
+    public PortfolioHistory portfolioHistoryYear() throws ApiException {
+        return alpacaAPI.trader().portfolioHistory().getAccountPortfolioHistory(null, "1D", "market_hours", OffsetDateTime.now().minusYears(1).plusSeconds(1), null, OffsetDateTime.now(), null, "false");
     }
 
     public LocalDateTime nextOpening() throws ApiException {
