@@ -16,7 +16,7 @@ public class NewsController {
     private NewsClient newsClient;
 
     @Autowired
-    SentimentService sentimentService;
+    private SentimentService sentimentService;
 
     @GetMapping("api/news")
     public ResponseEntity<String> getNews(){

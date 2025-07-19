@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 
 @Component
@@ -29,9 +28,16 @@ public class AlpacaApiWrapper {
         this.alpacaAPI = new AlpacaAPI(keyId, secretKey, TraderAPIEndpointType.PAPER, MarketDataWebsocketSourceType.IEX);
     }
 
-    public PortfolioHistory portfolioHistory() throws ApiException {
-        PortfolioHistory portfolioHistory = alpacaAPI.trader().portfolioHistory().getAccountPortfolioHistory("1D", "1Min", "continuous", OffsetDateTime.now().minusDays(2), null, null, null, "false");
-        return portfolioHistory; //TODO: Create an API and processing service that calls the portfolio history, processes it in the suitable format [Timestamp, open, close], and exposes this resource via an endpoint
+    public PortfolioHistory portfolioHistoryWeek() throws ApiException {
+        return alpacaAPI.trader().portfolioHistory().getAccountPortfolioHistory(null, "1Min", "market_hours", OffsetDateTime.now().minusDays(7).plusSeconds(1), null, OffsetDateTime.now(), null, "false");
+    }
+
+    public PortfolioHistory portfolioHistoryMonth() throws ApiException {
+        return alpacaAPI.trader().portfolioHistory().getAccountPortfolioHistory(null, "15Min", "market_hours", OffsetDateTime.now().minusDays(30).plusSeconds(1), null, OffsetDateTime.now(), null, "false");
+    }
+
+    public PortfolioHistory portfolioHistoryYear() throws ApiException {
+        return alpacaAPI.trader().portfolioHistory().getAccountPortfolioHistory(null, "1D", "market_hours", OffsetDateTime.now().minusYears(1).plusSeconds(1), null, OffsetDateTime.now(), null, "false");
     }
 
     public LocalDateTime nextOpening() throws ApiException {

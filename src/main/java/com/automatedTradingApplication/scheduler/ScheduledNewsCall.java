@@ -32,13 +32,12 @@ public class ScheduledNewsCall {
     private ScheduledTaskExecutor scheduledTaskExecutor;
 
     @Autowired
-    ScheduledTimeService scheduledTimeService;
+    private ScheduledTimeService scheduledTimeService;
 
     Logger logger = LoggerFactory.getLogger(ScheduledNewsCall.class);
 
     @Scheduled(fixedRate = 15000)
     public void makeNewsCall() throws Exception {
-        alpacaApiWrapper.portfolioHistory();
         logger.info("Scheduled article call...");
         boolean marketOpen = alpacaApiWrapper.isMarketOpen();
         logger.info("Market open: {}", marketOpen);

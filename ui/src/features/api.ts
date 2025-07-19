@@ -1,16 +1,20 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import type {PortfolioData} from "../types/portfolioData.ts";
 
 export const api = createApi({
     reducerPath: "api",
-    baseQuery: fetchBaseQuery({ baseUrl: "https://dummyjson.com/" }), //TODO: Change to your API base URL
+    baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:8080/api/" }),
     endpoints: (builder) => ({
-        getAllProducts: builder.query({ //TODO: Change to your API endpoint
-            query: () => "products",
+        getPortfolioDataWeek: builder.query<PortfolioData[], void>({
+            query: () => "portfolio/week",
         }),
-        getProduct: builder.query({
-            query: (product) => `products/search?q=${product}`,
+        getPortfolioDataMonth: builder.query<PortfolioData[], void>({
+            query: () => "portfolio/month",
+        }),
+        getPortfolioDataYear: builder.query<PortfolioData[], void>({
+            query: () => "portfolio/year",
         }),
     }),
 });
 
-export const { useGetAllProductsQuery, useGetProductQuery } = api;
+export const { useGetPortfolioDataWeekQuery, useGetPortfolioDataMonthQuery, useGetPortfolioDataYearQuery } = api;
