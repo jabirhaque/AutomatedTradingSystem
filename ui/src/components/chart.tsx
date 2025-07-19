@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import ReactECharts from 'echarts-for-react';
 import { useGetPortfolioDataWeekQuery, useGetPortfolioDataMonthQuery, useGetPortfolioDataYearQuery } from "../features/api.ts";
+import { CircularProgress, Button, Box, Stack } from "@mui/material";
 
 const upColor = '#00da3c';
 const upBorderColor = '#008F28';
@@ -16,10 +17,14 @@ export default function Chart() {
 
     const isLoading = timeRange === '1W' ? isWeekLoading : timeRange === '1M' ? isMonthLoading : isYearLoading;
     const error = timeRange === '1W' ? weekError : timeRange === '1M' ? monthError : yearError;
-    const portfolioData = timeRange === '1W' ? weekData : timeRange === '1M' ? monthData : yearData;
+    const portfolioData = timeRange === '1W' ? weekData : timeRange === '1M' ? monthData : timeRange === '1Y' ? yearData : null;
 
     if (isLoading) {
-        return <div>Loading...</div>;
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <CircularProgress size={100} />
+            </div>
+        );
     }
 
     if (error) {
@@ -184,68 +189,6 @@ export default function Chart() {
 
     return (
         <div>
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
-                <button
-                    onClick={() => setTimeRange('1W')}
-                    style={{
-                        padding: '10px 20px',
-                        fontSize: '16px',
-                        margin: '0 10px',
-                        borderRadius: '8px',
-                        border: '1px solid #ccc',
-                        backgroundColor: timeRange === '1W' ? '#007BFF' : '#f8f9fa',
-                        color: timeRange === '1W' ? '#fff' : '#000',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s ease',
-                    }}
-                    onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#0056b3')}
-                    onMouseOut={(e) =>
-                        (e.currentTarget.style.backgroundColor = timeRange === '1W' ? '#007BFF' : '#f8f9fa')
-                    }
-                >
-                    1W
-                </button>
-                <button
-                    onClick={() => setTimeRange('1M')}
-                    style={{
-                        padding: '10px 20px',
-                        fontSize: '16px',
-                        margin: '0 10px',
-                        borderRadius: '8px',
-                        border: '1px solid #ccc',
-                        backgroundColor: timeRange === '1M' ? '#007BFF' : '#f8f9fa',
-                        color: timeRange === '1M' ? '#fff' : '#000',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s ease',
-                    }}
-                    onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#0056b3')}
-                    onMouseOut={(e) =>
-                        (e.currentTarget.style.backgroundColor = timeRange === '1M' ? '#007BFF' : '#f8f9fa')
-                    }
-                >
-                    1M
-                </button>
-                <button
-                    onClick={() => setTimeRange('1Y')}
-                    style={{
-                        padding: '10px 20px',
-                        fontSize: '16px',
-                        margin: '0 10px',
-                        borderRadius: '8px',
-                        border: '1px solid #ccc',
-                        backgroundColor: timeRange === '1Y' ? '#007BFF' : '#f8f9fa',
-                        color: timeRange === '1Y' ? '#fff' : '#000',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s ease',
-                    }}
-                    onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#0056b3')}
-                    onMouseOut={(e) =>
-                        (e.currentTarget.style.backgroundColor = timeRange === '1Y' ? '#007BFF' : '#f8f9fa')
-                    }
-                >
-                    1Y
-                </button>
-            </div>
             <ReactECharts
                 option={option}
                 notMerge={true}
@@ -253,6 +196,37 @@ export default function Chart() {
                 theme={"theme_name"}
                 style={{ width: '100%', height: 'calc(100vh - 100px)' }}
             />
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    marginBottom: 2
+                }}
+            >
+                <Stack spacing={2} direction="row">
+                    <Button
+                        variant="outlined"
+                        onClick={() => setTimeRange('1W')}
+                        color={timeRange === '1W' ? 'primary' : 'inherit'}
+                    >
+                        1W
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        onClick={() => setTimeRange('1M')}
+                        color={timeRange === '1M' ? 'primary' : 'inherit'}
+                    >
+                        1M
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        onClick={() => setTimeRange('1Y')}
+                        color={timeRange === '1Y' ? 'primary' : 'inherit'}
+                    >
+                        1Y
+                    </Button>
+                </Stack>
+            </Box>
         </div>
     );
 }
