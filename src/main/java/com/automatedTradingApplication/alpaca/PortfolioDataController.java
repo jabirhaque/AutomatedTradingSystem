@@ -17,19 +17,16 @@ public class PortfolioDataController {
     @Autowired
     private PortfolioDataService portfolioDataService;
 
-    @CrossOrigin(origins = "http://localhost:5173")
     @GetMapping("api/portfolio/week")
     public ResponseEntity<List<PortfolioData>> getPortfolioDataWeek() throws ApiException {
         return ResponseEntity.ok(portfolioDataService.portfolioDataWeek());
     }
 
-    @CrossOrigin(origins = "http://localhost:5173")
     @GetMapping("api/portfolio/month")
     public ResponseEntity<List<PortfolioData>> getPortfolioDataMonth() throws ApiException {
         return ResponseEntity.ok(portfolioDataService.portfolioDataMonth());
     }
 
-    @CrossOrigin(origins = "http://localhost:5173")
     @GetMapping("api/portfolio/year")
     public ResponseEntity<List<PortfolioData>> getPortfolioDataYear() throws ApiException {
         return ResponseEntity.ok(portfolioDataService.portfolioDataYear());

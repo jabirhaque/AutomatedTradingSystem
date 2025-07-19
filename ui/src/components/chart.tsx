@@ -200,7 +200,7 @@ export default function Chart() {
                 sx={{
                     display: 'flex',
                     justifyContent: 'center',
-                    marginBottom: 2
+                    marginTop: 3
                 }}
             >
                 <Stack spacing={2} direction="row">
