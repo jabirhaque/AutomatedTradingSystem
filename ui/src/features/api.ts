@@ -3,7 +3,7 @@ import type {PortfolioData} from "../types/portfolioData.ts";
 
 export const api = createApi({
     reducerPath: "api",
-    baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:8080/api/" }),
+    baseQuery: fetchBaseQuery({ baseUrl: "https://automatedtradingsystem.fly.dev/api/" }),
     endpoints: (builder) => ({
         getPortfolioDataWeek: builder.query<PortfolioData[], void>({
             query: () => "portfolio/week",
