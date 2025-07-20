@@ -1,5 +1,5 @@
 export type PortfolioData = {
-    timestamp: string; // ISO string representation of LocalDateTime
+    timestamp: string;
     open: number;
     high: number;
     low: number;
