@@ -50,9 +50,6 @@ export default function Chart() {
         dataset: {
             source: data
         },
-        title: {
-            text: 'Portfolio Performance'
-        },
         tooltip: {
             trigger: 'axis',
             axisPointer: {
@@ -200,7 +197,7 @@ export default function Chart() {
                 notMerge={true}
                 lazyUpdate={true}
                 theme={"theme_name"}
-                style={{ width: '50%', height: 'calc(50vh)' }}
+                style={{ width: '100%', height: 'calc(85vh)' }}
             />
             <Stack
                 spacing={2}
