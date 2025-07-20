@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type {PortfolioData} from "../types/portfolioData.ts";
+import type {Position} from "../types/position.ts";
 
 export const api = createApi({
     reducerPath: "api",
@@ -15,7 +16,10 @@ export const api = createApi({
         getPortfolioDataYear: builder.query<PortfolioData[], void>({
             query: () => "portfolio/year",
         }),
+        getPositions: builder.query<Position[], void>({
+            query: () => "positions",
+        }),
     }),
 });
 
-export const { useGetPortfolioDataWeekQuery, useGetPortfolioDataMonthQuery, useGetPortfolioDataYearQuery } = api;
+export const { useGetPortfolioDataWeekQuery, useGetPortfolioDataMonthQuery, useGetPortfolioDataYearQuery, useGetPositionsQuery } = api;

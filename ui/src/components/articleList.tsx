@@ -1,4 +1,4 @@
-import { Box, List, ListItem, ListItemText } from "@mui/material";
+import {Box, List, ListItem, ListItemText, Typography} from "@mui/material";
 
 export default function ArticleList() {
     const articles = [
@@ -23,6 +23,9 @@ export default function ArticleList() {
                 textAlign: "left", // Ensure text alignment remains correct
             }}
         >
+            <Typography variant="h6" sx={{ marginBottom: 2 }}>
+                Recent Articles
+            </Typography>
             <List>
                 {articles.map((article, index) => (
                     <ListItem key={index}>

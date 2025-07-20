@@ -1,37 +1,50 @@
-import { Box, List, ListItem, ListItemText } from "@mui/material";
+import { Box, List, ListItem, ListItemText, CircularProgress, Typography } from "@mui/material";
+import { useGetPositionsQuery } from "../features/api";
 
 export default function StockList() {
-    const stocks = [
-        { symbol: "AAPL", name: "Apple Inc.", price: 175.64 },
-        { symbol: "GOOGL", name: "Alphabet Inc.", price: 2801.12 },
-        { symbol: "AMZN", name: "Amazon.com Inc.", price: 3450.96 },
-        { symbol: "MSFT", name: "Microsoft Corp.", price: 299.35 },
-        { symbol: "TSLA", name: "Tesla Inc.", price: 850.12 },
-        { symbol: "NFLX", name: "Netflix Inc.", price: 645.23 },
-        { symbol: "FB", name: "Meta Platforms Inc.", price: 325.45 },
-        { symbol: "NVDA", name: "NVIDIA Corp.", price: 220.67 },
-        { symbol: "UBER", name: "Uber Technologies", price: 45.67 },
-        { symbol: "LYFT", name: "Lyft Inc.", price: 35.12 }
-    ];
+    const { data: positions, isLoading, isError } = useGetPositionsQuery();
+
+    if (isLoading) {
+        return (
+            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
+
+    if (isError) {
+        return (
+            <Box sx={{ padding: 2 }}>
+                <Typography color="error">Failed to load positions.</Typography>
+            </Box>
+        );
+    }
 
     return (
         <Box
             sx={{
                 width: "15%",
-                height: "97%", // Fixed height
+                height: "97%",
                 padding: 2,
-                overflowY: "auto", // Enable vertical scrolling
-
-                direction: "rtl", // Move scrollbar to the left
-                textAlign: "left", // Ensure text alignment remains correct
+                overflowY: "auto",
+                direction: "rtl",
+                textAlign: "left",
             }}
         >
+            <Typography variant="h6" sx={{ marginBottom: 2 }}>
+                Current Positions
+            </Typography>
             <List>
-                {stocks.map((stock) => (
-                    <ListItem key={stock.symbol}>
+                {positions?.map((position) => (
+                    <ListItem key={position.symbol}>
                         <ListItemText
-                            primary={`${stock.symbol} - ${stock.name}`}
-                            secondary={`Price: $${stock.price.toFixed(2)}`}
+                            primary={`${position.symbol} (${position.exchange})`}
+                            secondary={`Qty: ${Number(position.qty).toFixed(2)}, Market Value: $${Number(position.marketValue).toFixed(2)}, Unrealized P/L: $${Number(position.unrealizedPl).toFixed(2)}`}
+                            sx={{
+                                backgroundColor: Number(position.unrealizedPl) >= 0 ? "lightgreen" : "lightcoral",
+                                borderRadius: "4px",
+                                padding: "8px",
+                            }}
                         />
                     </ListItem>
                 ))}
