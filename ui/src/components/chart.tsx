@@ -51,7 +51,7 @@ export default function Chart() {
             source: data
         },
         title: {
-            text: 'Automated Trading System Portfolio Performance'
+            text: 'Portfolio Performance'
         },
         tooltip: {
             trigger: 'axis',
@@ -188,45 +188,49 @@ export default function Chart() {
     };
 
     return (
-        <div>
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+            }}
+        >
             <ReactECharts
                 option={option}
                 notMerge={true}
                 lazyUpdate={true}
                 theme={"theme_name"}
-                style={{ width: '100%', height: 'calc(100vh - 100px)' }}
+                style={{ width: '50%', height: 'calc(50vh)' }}
             />
-            <Box
+            <Stack
+                spacing={2}
+                direction="row"
                 sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    marginTop: 3
+                    marginTop: 2,
                 }}
             >
-                <Stack spacing={2} direction="row">
-                    <Button
-                        variant="outlined"
-                        onClick={() => setTimeRange('1W')}
-                        color={timeRange === '1W' ? 'primary' : 'inherit'}
-                    >
-                        1W
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        onClick={() => setTimeRange('1M')}
-                        color={timeRange === '1M' ? 'primary' : 'inherit'}
-                    >
-                        1M
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        onClick={() => setTimeRange('1Y')}
-                        color={timeRange === '1Y' ? 'primary' : 'inherit'}
-                    >
-                        1Y
-                    </Button>
-                </Stack>
-            </Box>
-        </div>
+                <Button
+                    variant="outlined"
+                    onClick={() => setTimeRange('1W')}
+                    color={timeRange === '1W' ? 'primary' : 'inherit'}
+                >
+                    1W
+                </Button>
+                <Button
+                    variant="outlined"
+                    onClick={() => setTimeRange('1M')}
+                    color={timeRange === '1M' ? 'primary' : 'inherit'}
+                >
+                    1M
+                </Button>
+                <Button
+                    variant="outlined"
+                    onClick={() => setTimeRange('1Y')}
+                    color={timeRange === '1Y' ? 'primary' : 'inherit'}
+                >
+                    1Y
+                </Button>
+            </Stack>
+        </Box>
     );
 }
