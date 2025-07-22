@@ -10,10 +10,9 @@ This project is an **Automated Trading System** designed to analyse market news 
     - Positive sentiment → **Buy transaction**
     - Negative sentiment → **Short transaction**
 - **Trade Scheduling**: Trades are scheduled to be exited after a fixed duration of market exposure
+- **User Interface**: A web-based dashboard to visualize trades, performance and market news
 
 ## Planned Features
-
-- **User Interface**: A web-based dashboard to visualize trades, performance and market news
 - **Support for multiple news sources**: Integrate additional news APIs for broader market coverage
 - **Reporter Reliance**: Implement trade performance tracking for each reporter to weight sources and dynamically size positions with a self
   adjusting feedback loop
