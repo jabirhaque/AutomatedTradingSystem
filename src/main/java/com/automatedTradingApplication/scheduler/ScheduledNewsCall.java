@@ -38,6 +38,17 @@ public class ScheduledNewsCall {
 
     @Scheduled(fixedRate = 15000)
     public void makeNewsCall() throws Exception {
+        Runtime runtime = Runtime.getRuntime();
+
+        long usedMemory = runtime.totalMemory() - runtime.freeMemory();
+        long currentHeap = runtime.totalMemory();
+        long maxHeap = runtime.maxMemory();
+
+        logger.info("Used: {} MB, Current Heap: {} MB, Max Heap: {} MB",
+                usedMemory / (1024 * 1024),
+                currentHeap / (1024 * 1024),
+                maxHeap / (1024 * 1024));
+
         logger.info("Scheduled article call...");
         boolean marketOpen = alpacaApiWrapper.isMarketOpen();
         logger.info("Market open: {}", marketOpen);
