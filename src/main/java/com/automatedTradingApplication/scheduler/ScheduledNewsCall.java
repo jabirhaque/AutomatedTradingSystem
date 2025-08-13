@@ -29,10 +29,10 @@ public class ScheduledNewsCall {
     private ArticleSentimentRepository articleSentimentRepository;
 
     @Autowired
-    private ScheduledTaskExecutor scheduledTaskExecutor;
+    private ScheduledTimeService scheduledTimeService;
 
     @Autowired
-    private ScheduledTimeService scheduledTimeService;
+    private ScheduledJobRepository scheduledJobRepository;
 
     Logger logger = LoggerFactory.getLogger(ScheduledNewsCall.class);
 
@@ -63,27 +63,15 @@ public class ScheduledNewsCall {
                 if (score>0){
                     String qty = String.valueOf(alpacaClient.getQtyFromPrice(symbol,score*10000));
                     alpacaClient.partitionedBuy(symbol, qty, false);
-                    Runnable sellBackTask = () -> {
-                        try {
-                            alpacaClient.partitionedSale(symbol, qty, true);
-                        } catch (Exception e) {
-                            logger.debug("Error in the sale request of {} of {}", qty, symbol);
-                        }
-                    };
                     LocalDateTime scheduledTime = scheduledTimeService.getScheduledExitTime(LocalDateTime.now());
-                    scheduledTaskExecutor.scheduleTaskAtSpecificTime(sellBackTask, scheduledTime);
+                    ScheduledJob scheduledJob = ScheduledJob.builder().symbol(symbol).qty(qty).buy(false).sale(true).scheduledTime(scheduledTime).build();
+                    scheduledJobRepository.save(scheduledJob);
                 }else{
                     String qty = String.valueOf(alpacaClient.getQtyFromPrice(symbol, score*-10000));
                     String resultQty = alpacaClient.partitionedSale(symbol, qty, false);
-                    Runnable buyBackTask = () -> {
-                        try {
-                            alpacaClient.partitionedBuy(symbol, resultQty, true);
-                        } catch (Exception e) {
-                            logger.debug("Error in the purchase request of {} of {}", qty, symbol);
-                        }
-                    };
                     LocalDateTime scheduledTime = scheduledTimeService.getScheduledExitTime(LocalDateTime.now());
-                    scheduledTaskExecutor.scheduleTaskAtSpecificTime(buyBackTask, scheduledTime);
+                    ScheduledJob scheduledJob = ScheduledJob.builder().symbol(symbol).qty(resultQty).buy(true).sale(false).scheduledTime(scheduledTime).build();
+                    scheduledJobRepository.save(scheduledJob);
                 }
             }
         }
