@@ -9,14 +9,15 @@ This project is an **Automated Trading System** designed to analyse market news 
     - Trades are executed through the [**Alpaca API**](https://alpaca.markets/)
     - Positive sentiment → **Buy transaction**
     - Negative sentiment → **Short transaction**
-- **Trade Scheduling**: Trades are scheduled to be exited after a fixed duration of market exposure
+- **Trade Scheduling**: Positions are scheduled to be exited after a fixed duration of market exposure
+- **User Interface**: A web-based dashboard to visualize trades, performance and market news
 
 ## Planned Features
 
-- **User Interface**: A web-based dashboard to visualize trades, performance and market news
 - **Support for multiple news sources**: Integrate additional news APIs for broader market coverage
 - **Reporter Reliance**: Implement trade performance tracking for each reporter to weight sources and dynamically size positions with a self
   adjusting feedback loop
+- **Support for alternative asset classes**: Expand the system to support cryptocurrencies, commodities, and other asset classes
 
 ## Technology Stack
 ![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
