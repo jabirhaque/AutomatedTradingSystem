@@ -34,6 +34,9 @@ public class ScheduledNewsCall {
     @Autowired
     private ScheduledJobRepository scheduledJobRepository;
 
+    @Autowired
+    private ScheduledTaskExecutor scheduledTaskExecutor;
+
     Logger logger = LoggerFactory.getLogger(ScheduledNewsCall.class);
 
     @Scheduled(fixedRate = 15000)
@@ -52,6 +55,7 @@ public class ScheduledNewsCall {
         logger.info("Scheduled article call...");
         boolean marketOpen = alpacaApiWrapper.isMarketOpen();
         logger.info("Market open: {}", marketOpen);
+        scheduledTaskExecutor.executeJobs();
         if (marketOpen){
             ArticleSentiment articleSentiment = sentimentService.callArticleSentiment();
             ArticleSentiment lastArticleSentiment = articleSentimentRepository.findTopByOrderByCreatedDesc();
