@@ -55,8 +55,8 @@ public class ScheduledNewsCall {
         logger.info("Scheduled article call...");
         boolean marketOpen = alpacaApiWrapper.isMarketOpen();
         logger.info("Market open: {}", marketOpen);
-        scheduledTaskExecutor.executeJobs();
         if (marketOpen){
+            scheduledTaskExecutor.executeJobs();
             ArticleSentiment articleSentiment = sentimentService.callArticleSentiment();
             ArticleSentiment lastArticleSentiment = articleSentimentRepository.findTopByOrderByCreatedDesc();
             if (lastArticleSentiment == null || !lastArticleSentiment.getArticle().equals(articleSentiment.getArticle())){
