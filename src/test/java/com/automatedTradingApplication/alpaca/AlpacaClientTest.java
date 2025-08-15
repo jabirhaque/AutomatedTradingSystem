@@ -272,6 +272,35 @@ public class AlpacaClientTest{
     }
 
     @Test
+    void partitionedBuyEqualPosition() throws Exception {
+        String symbol = "AAPL";
+        String qty = "10.5";
+        boolean exit = false;
+
+        Position position = new Position();
+        position.setSymbol("AMZN");
+        position.setQty("150");
+
+        Position position2 = new Position();
+        position2.setSymbol("AAPL");
+        position2.setQty("-10.5");
+
+        Order mockClearOrder = new Order();
+        mockClearOrder.setSide(OrderSide.BUY);
+        mockClearOrder.setFilledQty("10.5");
+
+        List<Position> positions = List.of(position, position2);
+        Mockito.when(alpacaApiWrapper.getPositions()).thenReturn(positions);
+        Mockito.when(alpacaApiWrapper.clearPosition("AAPL")).thenReturn(mockClearOrder);
+
+        String actual = alpacaClient.partitionedBuy(symbol, qty, exit);
+
+        Mockito.verify(alpacaApiWrapper, Mockito.times(1)).clearPosition(symbol);
+        Mockito.verify(alpacaApiWrapper, Mockito.times(0)).sell(symbol, "0.0");
+        Assertions.assertEquals("10.5", actual);
+    }
+
+    @Test
     public void partitionedSaleTestNoPosition() throws Exception {
         String symbol = "AAPL";
         String qty = "10";
@@ -415,5 +444,34 @@ public class AlpacaClientTest{
         Mockito.verify(alpacaApiWrapper, Mockito.times(1)).clearPosition(symbol);
         Mockito.verify(alpacaApiWrapper, Mockito.times(1)).sell(symbol, "7.0");
         Assertions.assertEquals("10.0", actual);
+    }
+
+    @Test
+    public void partitionedSaleTestEqualPositionNoPartition() throws Exception {
+        String symbol = "AAPL";
+        String qty = "10.5";
+        boolean exit = false;
+
+        Position position = new Position();
+        position.setSymbol("AAPL");
+        position.setQty("10.5");
+
+        Position position2 = new Position();
+        position2.setSymbol("MSFT");
+        position2.setQty("50");
+
+        Order mockClearOrder = new Order();
+        mockClearOrder.setSide(OrderSide.SELL);
+        mockClearOrder.setFilledQty("10.5");
+
+        List<Position> positions = List.of(position, position2);
+        Mockito.when(alpacaApiWrapper.getPositions()).thenReturn(positions);
+        Mockito.when(alpacaApiWrapper.clearPosition("AAPL")).thenReturn(mockClearOrder);
+
+        String actual = alpacaClient.partitionedSale(symbol, qty, exit);
+
+        Mockito.verify(alpacaApiWrapper, Mockito.times(1)).clearPosition(symbol);
+        Mockito.verify(alpacaApiWrapper, Mockito.times(0)).sell(symbol, "0.0");
+        Assertions.assertEquals("10.5", actual);
     }
 }

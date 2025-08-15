@@ -47,6 +47,9 @@ public class AlpacaClient {
             return "0";
         }
         double position = Double.parseDouble(getQtyFromPosition(symbol));
+        if (position==Double.parseDouble(qty)){
+            return clearPosition(symbol, exit);
+        }
         if (position>0 && position<Double.parseDouble(qty)){
             logger.info("Partitioning sale request");
             String remainder = String.valueOf(Double.parseDouble(qty) - position);
@@ -69,6 +72,9 @@ public class AlpacaClient {
             return "0";
         }
         double position = Double.parseDouble(getQtyFromPosition(symbol));
+        if (-1*position==Double.parseDouble(qty)){
+            return clearPosition(symbol, exit);
+        }
         boolean partition = position < 0 && -1 * position < Double.parseDouble(qty);
         if (!partition){
             return buy(symbol, qty, exit);
