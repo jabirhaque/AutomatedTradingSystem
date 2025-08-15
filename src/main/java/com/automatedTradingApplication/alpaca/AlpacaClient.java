@@ -43,6 +43,9 @@ public class AlpacaClient {
 
     public String partitionedSale(String symbol, String qty, boolean exit) throws ApiException {
         logger.info("Attempting {} sale of {} of {}", qty, symbol, (exit?"scheduled exit":""));
+        if (Double.parseDouble(qty) == 0){
+            return "0";
+        }
         double position = Double.parseDouble(getQtyFromPosition(symbol));
         if (position>0 && position<Double.parseDouble(qty)){
             logger.info("Partitioning sale request");
@@ -62,6 +65,9 @@ public class AlpacaClient {
 
     public String partitionedBuy(String symbol, String qty, boolean exit) throws Exception {
         logger.info("Attempting {} buy of {} of {}", symbol, qty, (exit?"scheduled exit":""));
+        if (Double.parseDouble(qty) == 0){
+            return "0";
+        }
         double position = Double.parseDouble(getQtyFromPosition(symbol));
         boolean partition = position < 0 && -1 * position < Double.parseDouble(qty);
         if (!partition){
@@ -90,6 +96,9 @@ public class AlpacaClient {
 
     public String buy(String symbol, String qty, boolean exit) throws ApiException {
         logger.info("Buying {} of {}", qty, symbol);
+        if (Double.parseDouble(qty) == 0){
+            return "0";
+        }
         Order order = alpacaApiWrapper.buy(symbol, qty);
         try{
             Thread.sleep(2000);
@@ -103,6 +112,9 @@ public class AlpacaClient {
 
     public String sell(String symbol, String qty, boolean exit) throws ApiException {
         logger.info("Selling {} of {}", symbol, qty);
+        if (Double.parseDouble(qty) == 0){
+            return "0";
+        }
         Order order = alpacaApiWrapper.sell(symbol, qty);
         try{
             Thread.sleep(2000);
