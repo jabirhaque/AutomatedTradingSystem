@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class AlpacaClient {
@@ -88,6 +89,7 @@ public class AlpacaClient {
         while (!order.getStatus().equals(OrderStatus.FILLED)){
             try{
                 Thread.sleep(1000);
+                order = alpacaApiWrapper.getOrder(UUID.fromString(order.getId()));
             }catch(InterruptedException e){
                 e.printStackTrace();
             }
@@ -106,6 +108,7 @@ public class AlpacaClient {
         while (!order.getStatus().equals(OrderStatus.FILLED)){
             try{
                 Thread.sleep(1000);
+                order = alpacaApiWrapper.getOrder(UUID.fromString(order.getId()));
             }catch(InterruptedException e){
                 e.printStackTrace();
             }
@@ -124,6 +127,7 @@ public class AlpacaClient {
         while (!order.getStatus().equals(OrderStatus.FILLED)){
             try{
                 Thread.sleep(1000);
+                order = alpacaApiWrapper.getOrder(UUID.fromString(order.getId()));
             }catch(InterruptedException e){
                 e.printStackTrace();
             }
