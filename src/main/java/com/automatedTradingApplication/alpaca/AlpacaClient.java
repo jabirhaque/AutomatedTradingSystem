@@ -54,11 +54,6 @@ public class AlpacaClient {
             logger.info("Partitioning sale request");
             String remainder = String.valueOf(Double.parseDouble(qty) - position);
             clearPosition(symbol, exit);
-            try{
-                Thread.sleep(2000);
-            }catch(InterruptedException e){
-                e.printStackTrace();
-            }
             return String.valueOf(Double.parseDouble(shortSell(symbol, remainder, exit))+position);
         }if (position>Double.parseDouble(qty)){
             return sell(symbol, qty, exit);
@@ -82,11 +77,6 @@ public class AlpacaClient {
         logger.info("Partitioning buy request");
         String remainder = String.valueOf(Double.parseDouble(qty)+position);
         String clear = clearPosition(symbol, exit);
-        try{
-            Thread.sleep(2000);
-        }catch(InterruptedException e){
-            e.printStackTrace();
-        }
         String buy = buy(symbol, remainder, exit);
         return String.valueOf(Double.parseDouble(clear)+Double.parseDouble(buy));
     }
@@ -95,6 +85,13 @@ public class AlpacaClient {
         String qty = alpacaApiWrapper.getPositionFromSymbol(symbol);
         logger.info("Clearing {} of {}", qty, symbol);
         Order order = alpacaApiWrapper.clearPosition(symbol);
+        while (!order.getStatus().equals(OrderStatus.FILLED)){
+            try{
+                Thread.sleep(1000);
+            }catch(InterruptedException e){
+                e.printStackTrace();
+            }
+        }
         Transaction transaction = Transaction.builder().symbol(symbol).transactionType(order.getSide().toString()).qty(Double.parseDouble(order.getFilledQty())).exit(exit).submittedTimestamp(LocalDateTime.now()).build();
         transactionRepository.save(transaction);
         return order.getFilledQty();
@@ -106,10 +103,12 @@ public class AlpacaClient {
             return "0";
         }
         Order order = alpacaApiWrapper.buy(symbol, qty);
-        try{
-            Thread.sleep(2000);
-        }catch(InterruptedException e){
-            e.printStackTrace();
+        while (!order.getStatus().equals(OrderStatus.FILLED)){
+            try{
+                Thread.sleep(1000);
+            }catch(InterruptedException e){
+                e.printStackTrace();
+            }
         }
         Transaction transaction = Transaction.builder().symbol(symbol).transactionType(order.getSide().toString()).qty(Double.parseDouble(order.getFilledQty())).exit(exit).submittedTimestamp(LocalDateTime.now()).build();
         transactionRepository.save(transaction);
@@ -122,10 +121,12 @@ public class AlpacaClient {
             return "0";
         }
         Order order = alpacaApiWrapper.sell(symbol, qty);
-        try{
-            Thread.sleep(2000);
-        } catch(InterruptedException e){
-            e.printStackTrace();
+        while (!order.getStatus().equals(OrderStatus.FILLED)){
+            try{
+                Thread.sleep(1000);
+            }catch(InterruptedException e){
+                e.printStackTrace();
+            }
         }
         Transaction transaction = Transaction.builder().symbol(qty).transactionType(order.getSide().toString()).qty(Double.parseDouble(order.getFilledQty())).exit(exit).submittedTimestamp(LocalDateTime.now()).build();
         transactionRepository.save(transaction);
