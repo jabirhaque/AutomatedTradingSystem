@@ -4,6 +4,7 @@ import com.automatedTradingApplication.transaction.TransactionRepository;
 import net.jacobpeterson.alpaca.openapi.marketdata.ApiException;
 import net.jacobpeterson.alpaca.openapi.trader.model.Order;
 import net.jacobpeterson.alpaca.openapi.trader.model.OrderSide;
+import net.jacobpeterson.alpaca.openapi.trader.model.OrderStatus;
 import net.jacobpeterson.alpaca.openapi.trader.model.Position;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -89,6 +90,7 @@ public class AlpacaClientTest{
         boolean exit = false;
 
         Order mockOrder = new Order();
+        mockOrder.setStatus(OrderStatus.FILLED);
         mockOrder.setSide(OrderSide.BUY);
         mockOrder.setFilledQty(qty);
 
@@ -107,6 +109,7 @@ public class AlpacaClientTest{
         boolean exit = false;
 
         Order mockOrder = new Order();
+        mockOrder.setStatus(OrderStatus.FILLED);
         mockOrder.setSide(OrderSide.SELL);
         mockOrder.setFilledQty(qty);
 
@@ -125,6 +128,7 @@ public class AlpacaClientTest{
         boolean exit = false;
 
         Order mockOrder = new Order();
+        mockOrder.setStatus(OrderStatus.FILLED);
         mockOrder.setSide(OrderSide.SELL);
         mockOrder.setFilledQty("10.0");
 
@@ -142,6 +146,7 @@ public class AlpacaClientTest{
         boolean exit = false;
 
         Order mockOrder = new Order();
+        mockOrder.setStatus(OrderStatus.FILLED);
         mockOrder.setSide(OrderSide.SELL);
         mockOrder.setFilledQty("10");
 
@@ -168,6 +173,7 @@ public class AlpacaClientTest{
         position2.setQty("50");
 
         Order mockOrder = new Order();
+        mockOrder.setStatus(OrderStatus.FILLED);
         mockOrder.setSide(OrderSide.BUY);
         mockOrder.setFilledQty("10");
 
@@ -196,6 +202,7 @@ public class AlpacaClientTest{
         position2.setQty("50");
 
         Order mockOrder = new Order();
+        mockOrder.setStatus(OrderStatus.FILLED);
         mockOrder.setSide(OrderSide.BUY);
         mockOrder.setFilledQty("10");
 
@@ -224,6 +231,7 @@ public class AlpacaClientTest{
         position2.setQty("50");
 
         Order mockOrder = new Order();
+        mockOrder.setStatus(OrderStatus.FILLED);
         mockOrder.setSide(OrderSide.BUY);
         mockOrder.setFilledQty("10");
 
@@ -252,10 +260,12 @@ public class AlpacaClientTest{
         position2.setQty("50");
 
         Order mockClearOrder = new Order();
+        mockClearOrder.setStatus(OrderStatus.FILLED);
         mockClearOrder.setSide(OrderSide.BUY);
         mockClearOrder.setFilledQty("7");
 
         Order mockOrder = new Order();
+        mockOrder.setStatus(OrderStatus.FILLED);
         mockOrder.setSide(OrderSide.BUY);
         mockOrder.setFilledQty("3");
 
@@ -286,6 +296,7 @@ public class AlpacaClientTest{
         position2.setQty("-10.5");
 
         Order mockClearOrder = new Order();
+        mockClearOrder.setStatus(OrderStatus.FILLED);
         mockClearOrder.setSide(OrderSide.BUY);
         mockClearOrder.setFilledQty("10.5");
 
@@ -317,6 +328,7 @@ public class AlpacaClientTest{
         Order mockOrder = new Order();
         mockOrder.setSide(OrderSide.SELL);
         mockOrder.setFilledQty("10");
+        mockOrder.setStatus(OrderStatus.FILLED);
 
         List<Position> positions = List.of(position, position2);
         Mockito.when(alpacaApiWrapper.getPositions()).thenReturn(positions);
@@ -343,6 +355,7 @@ public class AlpacaClientTest{
         position2.setQty("50");
 
         Order mockOrder = new Order();
+        mockOrder.setStatus(OrderStatus.FILLED);
         mockOrder.setSide(OrderSide.SELL);
         mockOrder.setFilledQty("10");
 
@@ -371,6 +384,7 @@ public class AlpacaClientTest{
         position2.setQty("50");
 
         Order mockOrder = new Order();
+        mockOrder.setStatus(OrderStatus.FILLED);
         mockOrder.setSide(OrderSide.SELL);
         mockOrder.setFilledQty("10");
 
@@ -399,6 +413,7 @@ public class AlpacaClientTest{
         position2.setQty("50");
 
         Order mockOrder = new Order();
+        mockOrder.setStatus(OrderStatus.FILLED);
         mockOrder.setSide(OrderSide.SELL);
         mockOrder.setFilledQty("10.5");
 
@@ -427,10 +442,12 @@ public class AlpacaClientTest{
         position2.setQty("50");
 
         Order mockClearOrder = new Order();
+        mockClearOrder.setStatus(OrderStatus.FILLED);
         mockClearOrder.setSide(OrderSide.SELL);
         mockClearOrder.setFilledQty("3");
 
         Order mockOrder = new Order();
+        mockOrder.setStatus(OrderStatus.FILLED);
         mockOrder.setSide(OrderSide.SELL);
         mockOrder.setFilledQty("7.0");
 
@@ -461,6 +478,7 @@ public class AlpacaClientTest{
         position2.setQty("50");
 
         Order mockClearOrder = new Order();
+        mockClearOrder.setStatus(OrderStatus.FILLED);
         mockClearOrder.setSide(OrderSide.SELL);
         mockClearOrder.setFilledQty("10.5");
 
