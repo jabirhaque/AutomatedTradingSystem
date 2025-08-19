@@ -31,6 +31,7 @@ public class ScheduledTaskExecutor {
                 alpacaClient.partitionedSale(job.getSymbol(), job.getQty(), true);
             }
         }
+        logger.info("{} jobs executed successfully, deleting from DB", scheduledJobs.size());
         scheduledJobRepository.deleteAll(scheduledJobs);
     }
 }

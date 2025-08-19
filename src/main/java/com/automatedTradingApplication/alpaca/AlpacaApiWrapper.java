@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 public class AlpacaApiWrapper {
@@ -62,6 +63,10 @@ public class AlpacaApiWrapper {
 
     public String getPositionFromSymbol(String symbol) throws ApiException {
         return alpacaAPI.trader().positions().getOpenPosition(symbol).getQty();
+    }
+
+    public Order getOrder(UUID orderId) throws ApiException {
+        return alpacaAPI.trader().orders().getOrderByOrderID(orderId, false);
     }
 
     public Order clearPosition(String symbol) throws ApiException {
