@@ -88,6 +88,7 @@ public class AlpacaClient {
         Order order = alpacaApiWrapper.clearPosition(symbol);
         while (!order.getStatus().equals(OrderStatus.FILLED)){
             try{
+                logger.info("Waiting for order to be filled...");
                 Thread.sleep(1000);
                 order = alpacaApiWrapper.getOrder(UUID.fromString(order.getId()));
             }catch(InterruptedException e){
@@ -107,6 +108,7 @@ public class AlpacaClient {
         Order order = alpacaApiWrapper.buy(symbol, qty);
         while (!order.getStatus().equals(OrderStatus.FILLED)){
             try{
+                logger.info("Waiting for order to be filled...");
                 Thread.sleep(1000);
                 order = alpacaApiWrapper.getOrder(UUID.fromString(order.getId()));
             }catch(InterruptedException e){
@@ -126,6 +128,7 @@ public class AlpacaClient {
         Order order = alpacaApiWrapper.sell(symbol, qty);
         while (!order.getStatus().equals(OrderStatus.FILLED)){
             try{
+                logger.info("Waiting for order to be filled...");
                 Thread.sleep(1000);
                 order = alpacaApiWrapper.getOrder(UUID.fromString(order.getId()));
             }catch(InterruptedException e){
