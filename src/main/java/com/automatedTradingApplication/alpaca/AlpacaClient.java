@@ -135,7 +135,7 @@ public class AlpacaClient {
                 e.printStackTrace();
             }
         }
-        Transaction transaction = Transaction.builder().symbol(qty).transactionType(order.getSide().toString()).qty(Double.parseDouble(order.getFilledQty())).exit(exit).submittedTimestamp(LocalDateTime.now()).build();
+        Transaction transaction = Transaction.builder().symbol(symbol).transactionType(order.getSide().toString()).qty(Double.parseDouble(order.getFilledQty())).exit(exit).submittedTimestamp(LocalDateTime.now()).build();
         transactionRepository.save(transaction);
         return order.getFilledQty();
     }
